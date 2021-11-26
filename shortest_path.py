@@ -1,29 +1,29 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed Nov 24 13:22:07 2021
+Finds the shortest path on a graph.
+Inputs: 
+    - list_vertices, list of lists of tuples [[(x1,y1),(x2,y2),...,(x_k_,y_k)],...,[(xx1,yy1),(xx2,yy2),...,(xx_n,yy_n)]]. 
+    Each embedded list corresponds to an obstacle.
+    Each tuple (x,y) contains the coordinates of a vertex of the obstacle.
 
-@author: sebas
+    - list_neighbours, list of lists of tuples [[(vertex,distance),(vertex,distance),...],...,[(vertex,distance),(vertex,distance),...,(vertex,distance)]]
+    Each embedded list corresponds to the neighbours of a given vertex.
+    Each tuple (vertex,distance) contains the name of the neighbour and its distance from that vertex.
+    
+    - goal and start: coordinates (x,y) of the goal and start. If not specified, a Djikstra algorithm will be used ; otherwise, A* with Euclidean distance will be used.
+
+Output:
+    best_path, ordered list that contains the optimal path for the graph. 
+    Example: [0,1,3,5,6,7,8] where 0 is start and 8 is goal
+    
+Pseudo-code (inspired from course lectures and partially taken from https://fr.wikipedia.org/wiki/Algorithme_de_Dijkstra , consulted 24.11.2021):
+    
+
 """
 
 def find_shortest_path(list_vertices, list_neighbours, start=(-1,-1), goal=(-1,-1)):
-    """Finds the shortest path on a graph.
-    Inputs: 
-        - list_vertices, list of lists of tuples [[(x1,y1),(x2,y2),...,(x_k_,y_k)],...,[(xx1,yy1),(xx2,yy2),...,(xx_n,yy_n)]]. 
-        Each embedded list corresponds to an obstacle.
-        Each tuple (x,y) contains the coordinates of a vertex of the obstacle.
-    
-        - list_neighbours, list of lists of tuples [[(vertex,distance),(vertex,distance),...],...,[(vertex,distance),(vertex,distance),...,(vertex,distance)]]
-        Each embedded list corresponds to the neighbours of a given vertex.
-        Each tuple (vertex,distance) contains the name of the neighbour and its distance from that vertex.
-        
-        - goal and start: coordinates (x,y) of the goal and start. If not specified, a Djikstra algorithm will be used ; otherwise, A* with Euclidean distance will be used.
-    
-    Output:
-        best_path, ordered list that contains the optimal path for the graph. 
-        Example: [0,1,3,5,6,7,8] where 0 is start and 8 is goal
-        
-    Pseudo-code (inspired from course lectures and partially taken from https://fr.wikipedia.org/wiki/Algorithme_de_Dijkstra , consulted 24.11.2021):
-        
+    """
     """
     
     
@@ -49,16 +49,17 @@ def find_shortest_path(list_vertices, list_neighbours, start=(-1,-1), goal=(-1,-
     
     #attribute initial weights to each vertex
     infinity = 100000
-    weights = [infinity]*(N+2)                                                  #minimal distance to reach each vertex. Before exploration, =infinity
-    weights[0]=0
+    weights_djikstra = [infinity]*(N+2)                                        #minimal distance to reach each vertex. Before exploration, =infinity
+    weights_astar = weights_djikstra.copy()
+    weights_djikstra[0]=0
     predecessors = [-1]*(N+2)                                                   #best predecessor to reach each vertex (unknown at the beginning)
         
     
     #%% Applying Djikstra or A*
     while unexplored_names:                                                     #while there are still vertices to explore (vector non-empty)
-        weights_unexplored_names = []
+        weights_unexplored = []
         for vertex in unexplored_names:
-            weights_unexplored_names.append(weights[vertex])
+            weights_unexplored.append(weights[vertex])
         
         #set the current vertex to the one with lowest weight
         min_distance = min(weights_unexplored_names)
@@ -72,27 +73,29 @@ def find_shortest_path(list_vertices, list_neighbours, start=(-1,-1), goal=(-1,-
                 weights[ngb[0]] = weight_candidate
                 predecessors[ngb[0]] = current_vertex
                 
-                #if this neighbour was already explored, re-explore it to update weights
+                #if this neighbour was already explored, allow to re-explore it to update weights
                 if ngb[0] not in unexplored_names:
                     unexplored_names.append(ngb[0])
         
         #remove the current vertex from unexplored vertices
         unexplored_names.remove(current_vertex)
         
-        if ((N+1) in current_neighbours) and goal!=(-1,-1):                                     #if A* is used, no need to explore all graph
-            print(unexplored_names)
+        #if A* is used, stop the algorithm once the goal is reached (no need to explore the entire graph)
+        current_neighbours_flat = [x for sublist in current_neighbours for x in sublist]
+        name_current_neighbours = current_neighbours_flat[0::2]                 #extract the name of neighbours
+        if goal!=(-1,-1) and (name_vertices[-1] in name_current_neighbours):                
+            #print("Unexplored nodes: {}".format(unexplored_names))
             break
         
     
-    #%% Retrace the best path
+    #%% Retrace the best path going backwards (origin = where we came from. predecessor = best origin for a given vertex)
     best_path = []
-    origin = predecessors[-1]
+    origin = predecessors[-1]                                                   #predecessor of goal
     while origin!=-1:
-        best_path.insert(0,origin)
-        origin = predecessors[origin]
-    best_path.append(name_vertices[-1])
+        best_path.insert(0,origin)                                              #insert predecessor of vertex i at the beginning of best_path
+        origin = predecessors[origin]                                           #for next loop: change the value of "origin"
+    best_path.append(name_vertices[-1])                                         #add vertex "goal" to the best_path
 
-    
     return best_path
 
 #---------------------------------------------------------
