@@ -4,16 +4,21 @@ import cv2 as cv
 
 def crop_map(img):
     """crop the black borders out of the image to have a clean image to work on"""
-    max_crop = 10
-    thresh = 50
+    max_crop = 100
+    thresh = 200
     crop = 0
-    for i in range(max_crop):
+    img_gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+    img_blurred = cv.GaussianBlur(img_gray, (5, 5), cv.BORDER_DEFAULT)
+    img_filtered = cv.morphologyEx(img_blurred, cv.MORPH_CLOSE, np.ones((5, 5)))  # closing is a dilation followed by an erosion;
+    for i in range(1, max_crop, 5):                                         # it deletes small black points
         crop = i
-        cropped = img[i:-i, i:-i]
-        temp = cv.threshold(cropped, thresh, 1, cv.THRESH_BINARY_INV)
-        if temp[1, :].sum() > 10 or temp[temp.size(1), :].sum() > 10 or\
-                temp[:, 1].sum() > 10 or temp[:, temp.size(2)].sum() > 10:
+        cropped = img_filtered[i:-i, i:-i]
+        ret, temp = cv.threshold(cropped, thresh, 255, cv.THRESH_BINARY_INV)
+        cv.imshow("Thresholded", temp)
+        if np.sum(temp[1, :]) < 10 or np.sum(temp[temp.shape[0]-1, :]) < 10 or\
+                np.sum(temp[:, 1]) < 10 or np.sum(temp[:, temp.shape[1]-1]) < 10:
             break
+    print(crop)
     cropped_img = img[crop:-crop, crop:-crop]
     return True, cropped_img
 
