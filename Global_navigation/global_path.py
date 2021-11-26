@@ -7,21 +7,22 @@ class Point:
         self.y = y
 
 
+
 #test :
 
 #inputs data and useful data to have
 
 #obstacle1
-Sommet1 = Point(1, 1)
-Sommet2 = Point(10, 1)
-Sommet3 = Point(1, 2)
+Sommet1 = (1, 1)
+Sommet2 = (10, 1)
+Sommet3 = (1, 2)
 #obstacle2
-Sommet4 = Point(10, 2)
-Sommet5 = Point(10, 0)
-Sommet6 = Point(0, 10)
-Sommet7 = Point(0, 0)
-Sommet8 = Point(10, 10)
-Sommet9 = Point(10, 10)
+Sommet4 = (10, 2)
+Sommet5 = (10, 0)
+Sommet6 = (0, 10)
+Sommet7 = (0, 0)
+Sommet8 = (10, 10)
+Sommet9 = (10, 10)
 
 #liste des obstacles avant agrandissement
 list_vertices = [[Sommet1, Sommet2, Sommet3],[Sommet3, Sommet4, Sommet5, Sommet6, Sommet7, Sommet8, Sommet9]]
@@ -34,9 +35,17 @@ list_shifted_vertices = list_vertices*0,1
 list_obstacles_sides = [[Sommet1]]
 
 #liste de tous les chemins possibles pour passer d'un sommet à l'autre = matrice A
-list_all_path = [i for i in combinations(list_shifted_vertices, 2)]
+list_all_path = [i for i in combinations(list_vertices, 2)]
+print("all paths: {}".format(list_all_path))
+for k in list_vertices:
+    for vertex in k:
+        print(vertex)
+        sublist = [i for i in list_vertices if i != vertex]
+        print(sublist)
+
 #--> ça va nous donner quoi, une liste, un array, une matrice ??
 
+"""
 # Given three collinear points p, q, r, the function checks if
 # point q lies on line segment 'pr'
 def onSegment(p, q, r):
@@ -109,17 +118,17 @@ def doIntersect(p1, q1, p2, q2):
 #algo
 for k in list_all_path:
     #for i = 1 jusqu'à nombre obstacles
-        if doIntersect(je sais pas comment prendre toutes les valeurs de la matA et les comparer à celles de la matB)
+      #  if doIntersect(je sais pas comment prendre toutes les valeurs de la matA et les comparer à celles de la matB)
             print("Yes")
             list_possible_path[[i][k]] = list_all_path[[i][k]]
 
-        else:
+       # else:
             print("No")
             list_possible_path[[i][k]] = 666-666
 
     #list_possible_path = matrice C
 
-for i in list_possible_path
+for i in list_possible_path:
     list_distance_path = math.dist(list_possible_path[i])
     #list_distance_path = matrice D
 
@@ -158,3 +167,4 @@ for i in list_possible_path
 #
 # # This code is contributed by Ansh Riyal
 # #https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/?ref=lbp
+"""
