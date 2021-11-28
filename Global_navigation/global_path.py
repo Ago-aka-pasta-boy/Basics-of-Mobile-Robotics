@@ -91,12 +91,12 @@ def find_all_paths(list_vertices, start, goal):
 
 
 
-#test
-list_vertices = [[(10,10),(20,10),(15,18.66)],\
-                 [(30,25),(40,15),(53.66,18.66),(57.32,32.32),(47.32,42.32),(33.66,38.66)]]
-start = (0,0)
-goal = (70,60)
-res = find_all_paths(list_vertices, start, goal)
+# #test
+# list_vertices = [[(10,10),(20,10),(15,18.66)],\
+#                  [(30,25),(40,15),(53.66,18.66),(57.32,32.32),(47.32,42.32),(33.66,38.66)]]
+# start = (0,0)
+# goal = (70,60)
+# res = find_all_paths(list_vertices, start, goal)
 """
 #liste de tous les chemins possibles pour passer d'un sommet à l'autre = matrice A
 list_all_path = [i for i in combinations(list_shifted_vertices, 2)]

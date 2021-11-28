@@ -107,35 +107,39 @@ def find_shortest_path(obstacle_vertices, list_neighbours, start=("unspecified",
 
 #---------------------------------------------------------
 #%% Test
+import sys
 import time
 import math
 
-start_time = time.time()
-obstacle_vertices = [[(1,1),(2,2),(3,3)],[(4,4),(5,5),(6,6),(7,7)]]
-start = (0,0)
-goal = (10,10)
+sys.path.insert(1, 'Global_navigation')
+import global_path
 
-list_neighbours = [[(1,5),(2,10)],[(0,5),(3,4)],[(0,10),(3,15),(4,25)],[(1,4),(2,15),(5,30)],\
-                   [(2,25),(5,15)],[(3,30),(4,15),(6,2),(7,7)],[(5,2),(7,3),(8,15)],[(5,7),(6,3),(8,2)],[(6,15),(7,2)]]
-    
-print("The shortest path is:{}".format(find_shortest_path(obstacle_vertices, list_neighbours)))
+list_vertices = [[(10,10),(20,10),(15,18.66)],\
+                  [(30,25),(40,15),(53.66,18.66),(57.32,32.32),(47.32,42.32),(33.66,38.66)]]
+start = (0,0)
+goal = (70,60)
+start_time = time.time()
+list_neighbours = global_path.find_all_paths(list_vertices, start, goal)
+
+print("The shortest path is:{}".format(find_shortest_path(list_vertices, list_neighbours,start, goal)))
 print("Elapsed time: %s seconds" % (time.time() - start_time))
 
-start_time = time.time()
-obstacle_vertices = [[(2,1),(2,3),(3,1)],[(4,6),(6,8),(8,6),(8,4)]] 
-start = (0,0)
-goal = (10,10)
 
-dist = lambda p1,p2: math.sqrt((p1[1]-p2[1])**2+(p1[0]-p2[0])**2)
-list_neighbours = [[(1,dist(start,obstacle_vertices[0][0])), (2,dist(start,obstacle_vertices[0][1])), (3, dist(start,obstacle_vertices[0][2]))],\
-                    [(0,dist(obstacle_vertices[0][0],start)),(2,dist(obstacle_vertices[0][0],obstacle_vertices[0][1])),(3,dist(obstacle_vertices[0][0],obstacle_vertices[0][2]))],\
-                    [(0,dist(obstacle_vertices[0][1],start)),(1,dist(obstacle_vertices[0][1],obstacle_vertices[0][0])),(3,dist(obstacle_vertices[0][1],obstacle_vertices[0][2])),(4,dist(obstacle_vertices[0][1],obstacle_vertices[1][0])),(7,dist(obstacle_vertices[0][1],obstacle_vertices[1][3]))],\
-                    [(0,dist(obstacle_vertices[0][2],start)),(1,dist(obstacle_vertices[0][2],obstacle_vertices[0][0])),(2,dist(obstacle_vertices[0][2],obstacle_vertices[0][1])),(4,dist(obstacle_vertices[0][2],obstacle_vertices[1][0])),(7,dist(obstacle_vertices[0][2],obstacle_vertices[1][3]))],\
-                    [(2,dist(obstacle_vertices[1][0],obstacle_vertices[0][1])),(3,dist(obstacle_vertices[1][0],obstacle_vertices[0][2])),(5,dist(obstacle_vertices[1][0],obstacle_vertices[1][1])),(7,dist(obstacle_vertices[1][0],obstacle_vertices[1][3]))],\
-                    [(4,dist(obstacle_vertices[1][1],obstacle_vertices[1][0])),(6,dist(obstacle_vertices[1][1],obstacle_vertices[1][2])),(8,dist(obstacle_vertices[1][1],goal))],\
-                    [(5,dist(obstacle_vertices[1][2],obstacle_vertices[1][1])),(7,dist(obstacle_vertices[1][2],obstacle_vertices[1][3])),(8,dist(obstacle_vertices[1][2],goal))],\
-                    [(2,dist(obstacle_vertices[1][3],obstacle_vertices[0][1])),(3,dist(obstacle_vertices[1][3],obstacle_vertices[0][2])),(4,dist(obstacle_vertices[1][3],obstacle_vertices[1][0])),(6,dist(obstacle_vertices[1][3],obstacle_vertices[1][2])),(8,dist(obstacle_vertices[1][3],goal))],\
-                    [(5,dist(goal,obstacle_vertices[1][1])),(6,dist(goal,obstacle_vertices[1][2])),(7,dist(goal,obstacle_vertices[1][3]))]\
-                       ]    
-print("The shortest path (real graph) is:{}".format(find_shortest_path(obstacle_vertices, list_neighbours, start, goal)))
-print("Elapsed time: %s seconds" % (time.time() - start_time))
+# start_time = time.time()
+# obstacle_vertices = [[(2,1),(2,3),(3,1)],[(4,6),(6,8),(8,6),(8,4)]] 
+# start = (0,0)
+# goal = (10,10)
+
+# dist = lambda p1,p2: math.sqrt((p1[1]-p2[1])**2+(p1[0]-p2[0])**2)
+# list_neighbours = [[(1,dist(start,obstacle_vertices[0][0])), (2,dist(start,obstacle_vertices[0][1])), (3, dist(start,obstacle_vertices[0][2]))],\
+#                     [(0,dist(obstacle_vertices[0][0],start)),(2,dist(obstacle_vertices[0][0],obstacle_vertices[0][1])),(3,dist(obstacle_vertices[0][0],obstacle_vertices[0][2]))],\
+#                     [(0,dist(obstacle_vertices[0][1],start)),(1,dist(obstacle_vertices[0][1],obstacle_vertices[0][0])),(3,dist(obstacle_vertices[0][1],obstacle_vertices[0][2])),(4,dist(obstacle_vertices[0][1],obstacle_vertices[1][0])),(7,dist(obstacle_vertices[0][1],obstacle_vertices[1][3]))],\
+#                     [(0,dist(obstacle_vertices[0][2],start)),(1,dist(obstacle_vertices[0][2],obstacle_vertices[0][0])),(2,dist(obstacle_vertices[0][2],obstacle_vertices[0][1])),(4,dist(obstacle_vertices[0][2],obstacle_vertices[1][0])),(7,dist(obstacle_vertices[0][2],obstacle_vertices[1][3]))],\
+#                     [(2,dist(obstacle_vertices[1][0],obstacle_vertices[0][1])),(3,dist(obstacle_vertices[1][0],obstacle_vertices[0][2])),(5,dist(obstacle_vertices[1][0],obstacle_vertices[1][1])),(7,dist(obstacle_vertices[1][0],obstacle_vertices[1][3]))],\
+#                     [(4,dist(obstacle_vertices[1][1],obstacle_vertices[1][0])),(6,dist(obstacle_vertices[1][1],obstacle_vertices[1][2])),(8,dist(obstacle_vertices[1][1],goal))],\
+#                     [(5,dist(obstacle_vertices[1][2],obstacle_vertices[1][1])),(7,dist(obstacle_vertices[1][2],obstacle_vertices[1][3])),(8,dist(obstacle_vertices[1][2],goal))],\
+#                     [(2,dist(obstacle_vertices[1][3],obstacle_vertices[0][1])),(3,dist(obstacle_vertices[1][3],obstacle_vertices[0][2])),(4,dist(obstacle_vertices[1][3],obstacle_vertices[1][0])),(6,dist(obstacle_vertices[1][3],obstacle_vertices[1][2])),(8,dist(obstacle_vertices[1][3],goal))],\
+#                     [(5,dist(goal,obstacle_vertices[1][1])),(6,dist(goal,obstacle_vertices[1][2])),(7,dist(goal,obstacle_vertices[1][3]))]\
+#                        ]    
+# print("The shortest path (real graph) is:{}".format(find_shortest_path(obstacle_vertices, list_neighbours, start, goal)))
+# print("Elapsed time: %s seconds" % (time.time() - start_time))
