@@ -12,6 +12,7 @@ cap.set(cv.CAP_PROP_FRAME_HEIGHT, cap_size[1])              # height
 cap.set(cv.CAP_PROP_AUTO_EXPOSURE, 1)                       # set auto exposure
 
 while True:
+    time.sleep(1)
     captured, img = cap.read()
     if captured:
         cropped, cropped_img = vis.crop_map(img)
