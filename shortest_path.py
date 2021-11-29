@@ -14,21 +14,21 @@ Inputs:
     - goal and start: coordinates (x,y) of the goal and start. If not specified, a Djikstra algorithm will be used ; otherwise, A* with Euclidean distance will be used.
 
 Output:
-    best_path, ordered list that contains the optimal path for the graph. 
+    names_full_path, ordered list that contains the optimal path for the graph. 
     Example: [0,1,3,5,6,7,8] where 0 is start and 8 is goal
     
 Pseudo-code (inspired from course lectures and partially taken from https://fr.wikipedia.org/wiki/Algorithme_de_Dijkstra , consulted 24.11.2021):
     
 
 """
+import sys
+import time
+import math
+sys.path.insert(1, 'Global_navigation')
+import global_path
 
 def find_shortest_path(obstacle_vertices, list_neighbours, start=("unspecified","unspecified"), goal=("unspecified","unspecified")):
-    """
-    """
-    
-    
     #%%Initialisation
-    import math
     
     #attribute a name to each vertex: start (vertex 0), obstacle vertices (vertices 1...N), and goal (vertex N+1)
     obstacle_vertices_flattened = [item for sublist in obstacle_vertices for item in sublist]
@@ -96,34 +96,53 @@ def find_shortest_path(obstacle_vertices, list_neighbours, start=("unspecified",
         
     
     #%% Retrace the best path going backwards (origin = where we came from. predecessor = best origin for a given vertex)
-    best_path = []
+    names_full_path = []
     origin = predecessors[-1]                                                   #predecessor of goal
     while origin!="reached_start":
-        best_path.insert(0,origin)                                              #insert predecessor of vertex i at the beginning of best_path
+        names_full_path.insert(0,origin)                                              #insert predecessor of vertex i at the beginning of names_full_path
         origin = predecessors[origin]                                           #for next loop: change the value of "origin"
-    best_path.append(name_vertices[-1])                                         #add vertex "goal" to the best_path
+    names_full_path.append(name_vertices[-1])                                         #add vertex "goal" to the names_full_path
 
-    return best_path
+
+    return names_full_path
 
 #---------------------------------------------------------
-#%% Test
-import sys
-import time
-import math
+def names_to_subpaths(names_path, obstacle_vertices, start, goal):
+    obstacle_vertices_flattened = [item for sublist in obstacle_vertices for item in sublist]
+    N = len(obstacle_vertices_flattened)
+    
+    coords = [start]
+    for i in range(N):
+        if i+1 in names_path:
+            coords.append(obstacle_vertices_flattened[i])
+    coords.append(goal)
+    
+    substarts_x = [vertex[0] for vertex in coords]
+    substarts_x.pop()
+    substarts_y = [vertex[1] for vertex in coords]
+    substarts_y.pop()
+    subgoals = [vertex for vertex in coords]
+    subgoals.pop(0)
 
-sys.path.insert(1, 'Global_navigation')
-import global_path
-
+    return substarts_x, substarts_y, subgoals
+#----------------------------
+#%% Tests
 list_vertices = [[(10,10),(20,10),(15,18.66)],\
-                  [(30,25),(40,15),(53.66,18.66),(57.32,32.32),(47.32,42.32),(33.66,38.66)]]
+                  [(30,25),(40,15),(53.66,18.66),(57.32,32.32),(47.32,42.32),(33.66,38.66)],\
+                      [(59.27,27.55),(54.63,70.85),(67.09,69.57),(73.97,36.5)]]
 start = (0,0)
-goal = (70,60)
+goal = (75.88,42.09)
 start_time = time.time()
 list_neighbours = global_path.find_all_paths(list_vertices, start, goal)
+res = find_shortest_path(list_vertices, list_neighbours, start, goal)
 
-print("The shortest path is:{}".format(find_shortest_path(list_vertices, list_neighbours,start, goal)))
+print("The shortest path is:{}".format(res))
 print("Elapsed time: %s seconds" % (time.time() - start_time))
 
+x, y, xy = names_to_subpaths(res, list_vertices, start, goal)
+print("x-coordinates of substarts: {}".format(x))
+print("y-coordinates of substarts: {}".format(y))
+print("xy-coordinates of subgoals: {}".format(xy))
 
 # start_time = time.time()
 # obstacle_vertices = [[(2,1),(2,3),(3,1)],[(4,6),(6,8),(8,6),(8,4)]] 

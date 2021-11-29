@@ -2,8 +2,6 @@ import math
 import check_intersection #credits: Ansh Riyal, https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/ (cons. 27.11.2021)
 
 
-
-
 def find_all_paths(list_vertices, start, goal):
     #Initialisation
     
@@ -93,65 +91,9 @@ def find_all_paths(list_vertices, start, goal):
 
 # #test
 # list_vertices = [[(10,10),(20,10),(15,18.66)],\
-#                  [(30,25),(40,15),(53.66,18.66),(57.32,32.32),(47.32,42.32),(33.66,38.66)]]
+#                   [(30,25),(40,15),(53.66,18.66),(57.32,32.32),(47.32,42.32),(33.66,38.66)],\
+#                       [(68.21,44.49),(68.31,61.98),(50.82,62.08),(50.72,44.58)]]
 # start = (0,0)
 # goal = (70,60)
 # res = find_all_paths(list_vertices, start, goal)
-"""
-#liste de tous les chemins possibles pour passer d'un sommet à l'autre = matrice A
-list_all_path = [i for i in combinations(list_shifted_vertices, 2)]
-#--> ça va nous donner quoi, une liste, un array, une matrice ??
-
-
-#algo
-for k in list_all_path:
-    #for i = 1 jusqu'à nombre obstacles
-        if doIntersect(je sais pas comment prendre toutes les valeurs de la matA et les comparer à celles de la matB)
-            print("Yes")
-            list_possible_path[[i][k]] = list_all_path[[i][k]]
-
-        else:
-            print("No")
-            list_possible_path[[i][k]] = 666-666
-
-    #list_possible_path = matrice C
-
-for i in list_possible_path
-    list_distance_path = math.dist(list_possible_path[i])
-    #list_distance_path = matrice D
-
-
-
-# Driver program to test above functions:
-# p1 = Point(1, 1)
-# q1 = Point(10, 1)
-# p2 = Point(1, 2)
-# q2 = Point(10, 2)
-#
-# if doIntersect(p1, q1, p2, q2):
-#     print("Yes")
-# else:
-#     print("No")
-#
-# p1 = Point(10, 0)
-# q1 = Point(0, 10)
-# p2 = Point(0, 0)
-# q2 = Point(10, 10)
-#
-# if doIntersect(p1, q1, p2, q2):
-#     print("Yes")
-# else:
-#     print("No")
-#
-# p1 = Point(-5, -5)
-# q1 = Point(0, 0)
-# p2 = Point(1, 1)
-# q2 = Point(10, 10)
-#
-# if doIntersect(p1, q1, p2, q2):
-#     print("Yes")
-# else:
-#     print("No")
-#
-"""
-
+#print(res)
