@@ -4,19 +4,34 @@ import math
 
 
 def detect_circles(img, lower_range, upper_range):
-
     # convert img from rgb to hsv
     hsv = cv.cvtColor(img, cv.COLOR_BGR2HSV)
 
     # extract colored circles in white
     mask = cv.inRange(hsv, lower_range, upper_range)
+    mask_inv = cv.bitwise_not(mask)
+    cv.imshow("image mask", mask)
+    cv.waitKey(0)
+
+    # convert img from rgb to grayscale
+    gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+    cv.imshow("image grayscale", gray)
+    cv.waitKey(0)
+
+    # apply mask to grayscale image
+    img_masked = cv.bitwise_or(gray, gray, mask=mask_inv)
+    cv.imshow("image masked", img_masked)
+    cv.waitKey(0)
+
+    blurred = cv.blur(img_masked, (3, 3))
+    cv.imshow("image blurred", blurred)
+    cv.waitKey(0)
 
     # detect circles
-    blurred = cv.blur(mask, (3, 3))
     circles = cv.HoughCircles(blurred, cv.HOUGH_GRADIENT, 1, 20,
-                                param1 = 50, param2 = 30, minRadius = 1, maxRadius = 50)
-    print(circles)
-    #circles = np.uint16(np.around(circles))
+                                param1=40, param2=40, minRadius=10, maxRadius=100)
+
+    circles = np.uint16(np.around(circles))
     return circles
 
 # (x,y)
@@ -33,13 +48,16 @@ def get_goal_position(img):
         print("no circle found")
         return False, None
 
-    elif len(circle) > 1:
-        print("more than two circles found")
-        return len(circle)
+    dim = circle.shape
+    nb_circles = dim[1]
+    print("\ncoordinates of circle is:", circle, "\nnumber of circles detected is:", nb_circles)
 
-    center = (circle[0], circle[1])
+    if nb_circles > 1:
+        print("number of circles found", nb_circles)
+        return False, None
 
-    return center
+    center = circle[0, 0, 0:2]
+    return True, center
 
 
 # (x,y) + angle between -pi and pi
