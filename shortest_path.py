@@ -127,38 +127,20 @@ def names_to_subpaths(names_path, obstacle_vertices, start, goal):
     return substarts_x, substarts_y, subgoals
 #----------------------------
 #%% Tests
-list_vertices = [[(10,10),(20,10),(15,18.66)],\
-                  [(30,25),(40,15),(53.66,18.66),(57.32,32.32),(47.32,42.32),(33.66,38.66)],\
-                      [(59.27,27.55),(54.63,70.85),(67.09,69.57),(73.97,36.5)]]
-start = (0,0)
-goal = (75.88,42.09)
-start_time = time.time()
-list_neighbours = global_path.find_all_paths(list_vertices, start, goal)
-res = find_shortest_path(list_vertices, list_neighbours, start, goal)
-
-print("The shortest path is:{}".format(res))
-print("Elapsed time: %s seconds" % (time.time() - start_time))
-
-x, y, xy = names_to_subpaths(res, list_vertices, start, goal)
-print("x-coordinates of substarts: {}".format(x))
-print("y-coordinates of substarts: {}".format(y))
-print("xy-coordinates of subgoals: {}".format(xy))
-
-# start_time = time.time()
-# obstacle_vertices = [[(2,1),(2,3),(3,1)],[(4,6),(6,8),(8,6),(8,4)]] 
+# list_vertices = [[(10,10),(20,10),(15,18.66)],\
+#                   [(30,25),(40,15),(53.66,18.66),(57.32,32.32),(47.32,42.32),(33.66,38.66)],\
+#                       [(59.27,27.55),(54.63,70.85),(67.09,69.57),(73.97,36.5)]]
 # start = (0,0)
-# goal = (10,10)
+# goal = (75.88,42.09)
+# start_time = time.time()
+# list_neighbours = global_path.find_all_paths(list_vertices, start, goal)
+# res = find_shortest_path(list_vertices, list_neighbours, start, goal)
 
-# dist = lambda p1,p2: math.sqrt((p1[1]-p2[1])**2+(p1[0]-p2[0])**2)
-# list_neighbours = [[(1,dist(start,obstacle_vertices[0][0])), (2,dist(start,obstacle_vertices[0][1])), (3, dist(start,obstacle_vertices[0][2]))],\
-#                     [(0,dist(obstacle_vertices[0][0],start)),(2,dist(obstacle_vertices[0][0],obstacle_vertices[0][1])),(3,dist(obstacle_vertices[0][0],obstacle_vertices[0][2]))],\
-#                     [(0,dist(obstacle_vertices[0][1],start)),(1,dist(obstacle_vertices[0][1],obstacle_vertices[0][0])),(3,dist(obstacle_vertices[0][1],obstacle_vertices[0][2])),(4,dist(obstacle_vertices[0][1],obstacle_vertices[1][0])),(7,dist(obstacle_vertices[0][1],obstacle_vertices[1][3]))],\
-#                     [(0,dist(obstacle_vertices[0][2],start)),(1,dist(obstacle_vertices[0][2],obstacle_vertices[0][0])),(2,dist(obstacle_vertices[0][2],obstacle_vertices[0][1])),(4,dist(obstacle_vertices[0][2],obstacle_vertices[1][0])),(7,dist(obstacle_vertices[0][2],obstacle_vertices[1][3]))],\
-#                     [(2,dist(obstacle_vertices[1][0],obstacle_vertices[0][1])),(3,dist(obstacle_vertices[1][0],obstacle_vertices[0][2])),(5,dist(obstacle_vertices[1][0],obstacle_vertices[1][1])),(7,dist(obstacle_vertices[1][0],obstacle_vertices[1][3]))],\
-#                     [(4,dist(obstacle_vertices[1][1],obstacle_vertices[1][0])),(6,dist(obstacle_vertices[1][1],obstacle_vertices[1][2])),(8,dist(obstacle_vertices[1][1],goal))],\
-#                     [(5,dist(obstacle_vertices[1][2],obstacle_vertices[1][1])),(7,dist(obstacle_vertices[1][2],obstacle_vertices[1][3])),(8,dist(obstacle_vertices[1][2],goal))],\
-#                     [(2,dist(obstacle_vertices[1][3],obstacle_vertices[0][1])),(3,dist(obstacle_vertices[1][3],obstacle_vertices[0][2])),(4,dist(obstacle_vertices[1][3],obstacle_vertices[1][0])),(6,dist(obstacle_vertices[1][3],obstacle_vertices[1][2])),(8,dist(obstacle_vertices[1][3],goal))],\
-#                     [(5,dist(goal,obstacle_vertices[1][1])),(6,dist(goal,obstacle_vertices[1][2])),(7,dist(goal,obstacle_vertices[1][3]))]\
-#                        ]    
-# print("The shortest path (real graph) is:{}".format(find_shortest_path(obstacle_vertices, list_neighbours, start, goal)))
+# print("The shortest path is:{}".format(res))
+
+
+# x, y, xy = names_to_subpaths(res, list_vertices, start, goal)
+# print("x-coordinates of substarts: {}".format(x))
+# print("y-coordinates of substarts: {}".format(y))
+# print("xy-coordinates of subgoals: {}".format(xy))
 # print("Elapsed time: %s seconds" % (time.time() - start_time))

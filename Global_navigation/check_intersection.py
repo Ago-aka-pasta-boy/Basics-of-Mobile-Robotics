@@ -15,7 +15,7 @@ def onSegment(p, q, r):
            (q.y <= max(p.y, r.y)) and (q.y >= min(p.y, r.y))):
         return True
     return False
- 
+
 def orientation(p, q, r):
     # to find the orientation of an ordered triplet (p,q,r)
     # function returns the following values:
