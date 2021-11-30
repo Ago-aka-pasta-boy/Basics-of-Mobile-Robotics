@@ -136,19 +136,64 @@ def get_robot_position(img):
             print(dy, dx)
 
         angle = math.atan2(dy, dx)
-        position = np.array([point, angle])
+        position = [point, angle]
         return True, position
 
 
 def get_arch_positions(img):
+    # extract red arch in white with threshold
+    mask = extract_red(img)
+
+    # blur image
+    blurred = cv.blur(mask, (3, 3))
+
+    cv.imshow("image blurred", mask)
+    cv.waitKey(0)
+    cv.destroyAllWindows()
+
+    # convert to gray image to detect shape
+    gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+
+    # detect rectangle
+    c, hierarchy = cv.findContours(mask, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
+    peri = cv.arcLength(c[0], True)
+    approx = cv.approxPolyDP(c[0], 0.04 * peri, True)
+    (x, y, w, h) = cv.boundingRect(approx)
+
+    # find point1 and point2
+    center = np.array([x+w/2, y+h/2], dtype=int)
+    point1 = np.array([center[0]+w, center[1]])
+    point2 = np.array([center[0]-w, center[1]])
+
+    # draw points on img
+    cv.circle(img, point1, 2, (0, 0, 0), 3)
+    cv.circle(img, point2, 2, (0, 0, 0), 3)
+    cv.circle(img, center, 2, (0, 0, 0), 3)
+
+    # draw center and two positions
+    cv.imshow("point1 and point2 of rectangle", img)
+    cv.waitKey(0)
+    cv.destroyAllWindows()
+
+    return point1, point2
+
+
+def extract_red(img):
     hsv = cv.cvtColor(img, cv.COLOR_BGR2HSV)
 
-    lower_red = np.array([169, 100, 100])
-    upper_red = np.array([189, 255, 255])
+    # mask detection in hsv for red color
+    lower_red1 = np.array([0, 70, 0])
+    upper_red1 = np.array([15, 255, 255])
 
-    # extract red arch in white
-    mask = cv.inRange(hsv, lower_red, upper_red)
-    blurred = cv.blur(mask, (3, 3))
+    lower_red2 = np.array([170, 70, 0])
+    upper_red2 = np.array([180, 255, 255])
+
+    mask1 = cv.inRange(hsv, lower_red1, upper_red1)
+    mask2 = cv.inRange(hsv, lower_red2, upper_red2)
+
+    mask = mask1 | mask2
+
+    return mask
 
 
 
