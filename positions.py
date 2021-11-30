@@ -130,15 +130,7 @@ def get_robot_position(img):
             dx = circles[1,0]-circles[0,0]
             print(dy, dx)
         else:
-            point = circles[1, 0:2]
-            dy = circles[1,1]-circles[0,1]
-            dx = circles[0,0]-circles[1,0]
-            print(dy, dx)
 
-        angle = math.atan2(dy, dx)
-        position = np.array([point, angle])
-
-        return True, position
 
 
 def get_arch_positions(img):
