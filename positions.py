@@ -122,20 +122,21 @@ def get_robot_position(img):
         print("number of circles found", nb_circles)
         return False, None
 
-    # find bigger circle between the two
+    # direction of the robot
     if nb_circles == 2:
         if circles[0, 2] > circles[1, 2]:
-            center1 = circles[0, 0:2]
-            center2 = circles[1, 0:2]
+            point = circles[0, 0:2]
+            dy = circles[0,1]-circles[1,1]
+            dx = circles[1,0]-circles[0,0]
+            print(dy, dx)
         else:
-            center1 = circles[1, 0:2]
-            center2 = circles[0, 0:2]
-        print("center 1 and 2", center1, center2)
+            angle = math.atan2(circles[0,1]-circles[1,1], circles[1,0]-circles[0,0])
+            dy = circles[0,1]-circles[1,1]
+            dx = circles[0,0]-circles[1,0]
+            print(dy, dx)
 
-    # find direction of the robot
-    angle = math.atan2(center2[1]-center1[1], center2[0]-center2[0])
-
-    position = np.array([center1, angle])
+    angle = math.atan2(dy, dx)
+    position = np.array([point, angle])
 
     return True, position
 
