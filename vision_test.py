@@ -16,6 +16,7 @@ while True:
         print("debugging ON")
     else:
         print("debugging OFF")
+    np.imshow("drawing", img)
     time.sleep(1)
     captured, img = cap.read()
     if captured:

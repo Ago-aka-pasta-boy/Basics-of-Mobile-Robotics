@@ -1,7 +1,9 @@
 import numpy as np
 import cv2 as cv
+import math
 
 SCALING_FACTOR = 1.2
+ROBOT_LINE = 10
 
 
 def crop_map(img):
@@ -76,3 +78,29 @@ def expand_obstacles(obstacles):
             ex_obstacles[c][d][0][0] = cx + vec_x * SCALING_FACTOR
             ex_obstacles[c][d][0][1] = cy + vec_y * SCALING_FACTOR
     return ex_obstacles
+
+
+def annotate_path(path, img):
+    """draws a line from start to end on the provided image"""
+    for vert in path-1:
+        cv.line(img, path[vert], path[vert+1], (255, 255, 255), 3)
+
+
+def annotate_actors(robot_pos, goal_pos, arch_pos, img):
+    """draws the robot, the goal and the arch on the provided image"""
+    cv.circle(img, goal_pos, 50, (0, 255, 0), -1)
+    cv.rectangle(img, arch_pos["top-left"], arch_pos["bot-right"], (255, 0, 0), -1)
+    cv.circle(img, robot_pos[0], 30, (0, 0, 255), -1)
+    point2 = tuple(robot_pos[0][0]+math.cos(robot_pos[1]*ROBOT_LINE), robot_pos[0][1]+math.sin(robot_pos[1]*ROBOT_LINE))
+    cv.line(img, robot_pos[0], point2, (0, 0, 255), 3)
+
+
+def convert_vertice(obstacles):
+    """convert the base listing of opencv for contours into an array of arrays of tuples used in global navigation"""
+    converted_vertice = []
+    conv = []
+    for c in range(len(obstacles)):
+        for d in range(len(obstacles[c])):
+            conv.append(tuple(obstacles[c][d][0]))
+        converted_vertice.append(conv)
+    return converted_vertice
