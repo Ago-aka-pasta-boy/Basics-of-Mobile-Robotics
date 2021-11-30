@@ -80,7 +80,7 @@ def detect_circles(img, lower_range, upper_range):
 
 # return position of the goal (x,y)
 def get_goal_position(img):
-    # green color in hsv: 120°, 100%, 50% or 120°, 100%, 100%
+    # color value for green in hsv
     lower_green = np.array([35, 50, 0])
     upper_green = np.array([75, 255, 255])
 
@@ -122,22 +122,23 @@ def get_robot_position(img):
         print("number of circles found", nb_circles)
         return False, None
 
-    # find bigger circle between the two
+    # direction of the robot
     if nb_circles == 2:
         if circles[0, 2] > circles[1, 2]:
-            center1 = circles[0, 0:2]
-            center2 = circles[1, 0:2]
+            point = circles[0, 0:2]
+            dy = circles[0,1]-circles[1,1]
+            dx = circles[1,0]-circles[0,0]
+            print(dy, dx)
         else:
-            center1 = circles[1, 0:2]
-            center2 = circles[0, 0:2]
-        print("center 1 and 2", center1, center2)
+            point = circles[1, 0:2]
+            dy = circles[1,1]-circles[0,1]
+            dx = circles[0,0]-circles[1,0]
+            print(dy, dx)
 
-    # find direction of the robot
-    angle = math.atan2(center2[1]-center1[1], center2[0]-center2[0])
+        angle = math.atan2(dy, dx)
+        position = np.array([point, angle])
 
-    position = np.array([center1, angle])
-
-    return True, position
+        return True, position
 
 
 def get_arch_positions(img):
