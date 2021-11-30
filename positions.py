@@ -39,14 +39,7 @@ def detect_circles(img, lower_range, upper_range):
         return None
 
     # draw circles
-    radius_map = {}
-    for n in range(20, 250, 1):
-        radius_map[n] = []
-
-    # convert the (x, y) coordinates and radius of the circles to integers
-    circles = np.round(circles[0, :]).astype("int")
-
-    """"
+    """"    
     output = img.copy
     
     for (x, y, r) in circles:
@@ -68,14 +61,20 @@ def detect_circles(img, lower_range, upper_range):
                 cv.imshow(f"Radius {key}", output)
     """
 
-    for i in circles:
+    output = cv.cvtColor(gray, cv.COLOR_GRAY2BGR)
+    circles = np.uint16(np.around(circles))
+    for i in circles[0, :]:
         # draw the outer circle
-        cv.circle(img, (i[0], i[1]), i[2], (0, 255, 0), 2)
+        cv.circle(output, (i[0], i[1]), i[2], (0, 255, 0), 2)
         # draw the center of the circle
-        cv.circle(img, (i[0], i[1]), 2, (0, 0, 255), 3)
+        cv.circle(output, (i[0], i[1]), 2, (0, 0, 255), 3)
 
+    cv.imshow("detected circles", output)
     cv.waitKey(0)
     cv.destroyAllWindows()
+
+    # convert the (x, y) coordinates and radius of the circles to integers
+    circles = np.round(circles[0, :]).astype("int")
 
     return circles
 
@@ -134,7 +133,7 @@ def get_robot_position(img):
         print("center 1 and 2", center1, center2)
 
     # find direction of the robot
-    angle = math.atan2((center2[1]-center1[1])/(center2[1]-center2[0]))
+    angle = math.atan2(center2[1]-center1[1], center2[0]-center2[0])
 
     position = np.array([center1, angle])
 
