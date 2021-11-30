@@ -13,6 +13,5 @@ print("\nSuccess is", success, "\nGoal position is:", goal, "\n")
 success, robot_position = pos.get_robot_position(img)
 print("\nSuccess is", success, "\nRobot position is:", robot_position, "\n")
 
-rect_coord = pos.get_arch_positions(img)
-print("\nRectangle coordinates: x, y, w, h", rect_coord)
-
+positions = pos.get_arch_positions(img)
+print("\nTwo positions", positions)

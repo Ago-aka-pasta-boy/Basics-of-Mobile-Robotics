@@ -10,22 +10,14 @@ def detect_circles(img, lower_range, upper_range):
     # threshold colored circles
     mask = cv.inRange(hsv, lower_range, upper_range)
     mask_inv = cv.bitwise_not(mask)
-    cv.imshow("image mask", mask)
-    cv.waitKey(0)
-    cv.destroyAllWindows()
 
     # convert img from rgb to grayscale
     gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-    cv.imshow("image grayscale", gray)
-    cv.waitKey(0)
-    cv.destroyAllWindows()
 
     # apply threshold mask to grayscale image
     img_masked = cv.bitwise_and(gray, gray, mask=mask)
-    cv.imshow("image masked", img_masked)
-    cv.waitKey(0)
-    cv.destroyAllWindows()
 
+    # blur image
     blurred = cv.blur(img_masked, (5, 5))
     cv.imshow("image blurred", blurred)
     cv.waitKey(0)
@@ -84,6 +76,7 @@ def get_goal_position(img):
     lower_green = np.array([35, 50, 0])
     upper_green = np.array([75, 255, 255])
 
+    # detect circle
     circle = detect_circles(img, lower_green, upper_green)
 
     if circle is None:
@@ -92,7 +85,7 @@ def get_goal_position(img):
 
     dim = circle.shape
     nb_circles = dim[0]
-    print("\ncoordinates of circle is:", circle, "\nnumber of circles detected is:", nb_circles)
+    #print("\ncoordinates of circle is:", circle, "\nnumber of circles detected is:", nb_circles)
 
     if nb_circles > 1:
         print("number of circles found", nb_circles)
@@ -147,12 +140,9 @@ def get_arch_positions(img):
     # blur image
     blurred = cv.blur(mask, (3, 3))
 
-    cv.imshow("image blurred", mask)
+    cv.imshow("image blurred", blurred)
     cv.waitKey(0)
     cv.destroyAllWindows()
-
-    # convert to gray image to detect shape
-    gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 
     # detect rectangle
     c, hierarchy = cv.findContours(mask, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
