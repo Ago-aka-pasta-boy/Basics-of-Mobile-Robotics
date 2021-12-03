@@ -4,11 +4,11 @@ import shortest_path as short
 import math
 
 KP = 2
-EPSILON = 15 # 15 pixels
+EPSILON = 15  # 15 pixels
 NORMAL_SPEED = 150
 
 
-def set_speed(err):
+def speed_control(err):
     if err < -EPSILON:
         # turn right
         motor_left_target = KP*err
@@ -25,7 +25,7 @@ def set_speed(err):
         motor_right_target = NORMAL_SPEED
 
 
-def control(img, next_goal):
+def get_error(img, next_goal):
     robot_pos = pos.get_robot_position(img)
 
     alpha = robot_pos[1,0]
