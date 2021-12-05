@@ -86,13 +86,22 @@ def annotate_path(path, img):
         cv.line(img, path[vert], path[vert+1], (255, 255, 255), 3)
 
 
-def annotate_actors(robot_pos, goal_pos, arch_pos, img):
-    """draws the robot, the goal and the arch on the provided image"""
-    cv.circle(img, goal_pos, 50, (0, 255, 0), -1)
-    cv.rectangle(img, arch_pos["top-left"], arch_pos["bot-right"], (255, 0, 0), -1)
+def annotate_robot(robot_pos, img):
+    """draws the robot on the provided image"""
     cv.circle(img, robot_pos[0], 30, (0, 0, 255), -1)
-    point2 = tuple(robot_pos[0][0]+math.cos(robot_pos[1]*ROBOT_LINE), robot_pos[0][1]+math.sin(robot_pos[1]*ROBOT_LINE))
+    point2 = [robot_pos[0][0]+math.cos(robot_pos[1]*ROBOT_LINE), robot_pos[0][1]+math.sin(robot_pos[1]*ROBOT_LINE)]
+    point2 = tuple(point2)
     cv.line(img, robot_pos[0], point2, (0, 0, 255), 3)
+
+
+def annotate_goal(goal_pos, img):
+    """draws the goal on the provided image"""
+    cv.circle(img, goal_pos, 50, (0, 255, 0), -1)
+
+
+def annotate_arch(arch_pos, img):
+    """draws the arch on the provided image"""
+    cv.rectangle(img, arch_pos["top-left"], arch_pos["bot-right"], (255, 0, 0), -1)
 
 
 def convert_vertice(obstacles):
