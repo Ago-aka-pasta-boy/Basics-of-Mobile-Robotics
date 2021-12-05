@@ -3,7 +3,7 @@ import cv2 as cv
 import math
 
 SCALING_FACTOR = 1.2
-ROBOT_LINE = 10
+ROBOT_LINE = 50
 
 
 def crop_map(img):
@@ -89,10 +89,9 @@ def annotate_path(path, img):
 
 def annotate_robot(robot_pos, img):
     """draws the robot on the provided image"""
-    cv.circle(img, robot_pos[0], 30, (0, 0, 255), -1)
-    point2 = [robot_pos[0][0]+math.cos(robot_pos[1]*ROBOT_LINE), robot_pos[0][1]+math.sin(robot_pos[1]*ROBOT_LINE)]
-    point2 = tuple(point2)
-    cv.line(img, robot_pos[0], point2, (0, 0, 255), 3)
+    cv.circle(img, robot_pos[0], 10, (0, 0, 255), -1)
+    point2 = (int(robot_pos[0][0]+math.cos(robot_pos[1])*ROBOT_LINE), int(robot_pos[0][1]-math.sin(robot_pos[1])*ROBOT_LINE))
+    cv.line(img, robot_pos[0], point2, (0, 0, 255), 5)
     cv.putText(img, "Thymio", robot_pos[0], cv.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
 
 
