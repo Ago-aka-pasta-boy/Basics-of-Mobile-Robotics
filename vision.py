@@ -3,7 +3,7 @@ import cv2 as cv
 import math
 
 SCALING_FACTOR = 1.2
-ROBOT_LINE = 10
+ROBOT_LINE = 50
 
 
 def crop_map(img):
@@ -50,7 +50,8 @@ def extract_obstacles(img):
     cv.imshow("Contours", im2)
     obstacles = []
     for i in range(len(approximations)):
-        print("approx", i, len(approximations[i]))
+        if __debug__:
+            print("approx", i, len(approximations[i]))
         if len(approximations[i]) < 5:
             obstacles.append(approximations[i])
     im3 = np.zeros(img.shape)
@@ -86,13 +87,26 @@ def annotate_path(path, img):
         cv.line(img, path[vert], path[vert+1], (255, 255, 255), 3)
 
 
-def annotate_actors(robot_pos, goal_pos, arch_pos, img):
-    """draws the robot, the goal and the arch on the provided image"""
-    cv.circle(img, goal_pos, 50, (0, 255, 0), -1)
-    cv.rectangle(img, arch_pos["top-left"], arch_pos["bot-right"], (255, 0, 0), -1)
-    cv.circle(img, robot_pos[0], 30, (0, 0, 255), -1)
-    point2 = tuple(robot_pos[0][0]+math.cos(robot_pos[1]*ROBOT_LINE), robot_pos[0][1]+math.sin(robot_pos[1]*ROBOT_LINE))
-    cv.line(img, robot_pos[0], point2, (0, 0, 255), 3)
+def annotate_robot(robot_pos, img):
+    """draws the robot on the provided image"""
+    cv.circle(img, robot_pos[0], 10, (0, 0, 255), -1)
+    point2 = (int(robot_pos[0][0]+math.cos(robot_pos[1])*ROBOT_LINE), int(robot_pos[0][1]-math.sin(robot_pos[1])*ROBOT_LINE))
+    cv.line(img, robot_pos[0], point2, (0, 0, 255), 5)
+    cv.putText(img, "Thymio", robot_pos[0], cv.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+
+
+def annotate_goal(goal_pos, img):
+    """draws the goal on the provided image"""
+    cv.circle(img, (goal_pos[0], goal_pos[1]), goal_pos[2], (0, 255, 0), -1)
+    cv.putText(img, "Goal", (goal_pos[0], goal_pos[1]), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+
+
+def annotate_arch(arch_pos, img):
+    """draws the way through the arch on the provided image"""
+    point1 = arch_pos[len(arch_pos)-2]
+    point2 = arch_pos[len(arch_pos)-1]
+    cv.line(img, point1, point2, (0, 0, 255), -1)
+    cv.putText(img, "arch", ((arch_pos[0][0]+arch_pos[0][1])/2, arch_pos[1]), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
 
 
 def convert_vertice(obstacles):
