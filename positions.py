@@ -25,7 +25,7 @@ def detect_circles(img, lower_range, upper_range):
 
     # detect circles
     circles = cv.HoughCircles(blurred, cv.HOUGH_GRADIENT, 1, 20,
-                                param1=50, param2=30, minRadius=5, maxRadius=100)
+                              param1=50, param2=30, minRadius=5, maxRadius=100)
     if circles is None:
         print("no circle found")
         return None
@@ -33,10 +33,10 @@ def detect_circles(img, lower_range, upper_range):
     # draw circles
     """"    
     output = img.copy
-    
+
     for (x, y, r) in circles:
         radius_map[r].append((x, y, r))
-        
+
     for x, y, r in circles[0,:]:
         cv.circle(output, (x, y), r, (0, 255, 0), 4)
         cv.imshow("circles in green", output)
@@ -44,7 +44,7 @@ def detect_circles(img, lower_range, upper_range):
     """
     for (x, y, r) in circles:
         radius_map[r].append((x, y, r))
-    
+
     for key in radius_map:
         if len(radius_map[key]) > 0:
             output = img.copy()
@@ -70,6 +70,7 @@ def detect_circles(img, lower_range, upper_range):
 
     return circles
 
+
 # return position of the goal (x,y)
 def get_goal_position(img):
     # color value for green in hsv
@@ -85,7 +86,7 @@ def get_goal_position(img):
 
     dim = circle.shape
     nb_circles = dim[0]
-    #print("\ncoordinates of circle is:", circle, "\nnumber of circles detected is:", nb_circles)
+    # print("\ncoordinates of circle is:", circle, "\nnumber of circles detected is:", nb_circles)
 
     if nb_circles > 1:
         print("number of circles found", nb_circles)
@@ -119,8 +120,8 @@ def get_robot_position(img):
     if nb_circles == 2:
         if circles[0, 2] > circles[1, 2]:
             point = circles[0, 0:2]
-            dy = circles[0,1]-circles[1,1]
-            dx = circles[1,0]-circles[0,0]
+            dy = circles[0, 1] - circles[1, 1]
+            dx = circles[1, 0] - circles[0, 0]
             print(dy, dx)
         else:
             point = circles[1, 0:2]
@@ -146,26 +147,44 @@ def get_arch_positions(img):
 
     # detect rectangle
     c, hierarchy = cv.findContours(mask, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
+
+    if hierarchy is None:
+        print("WARNING: no arch found")
+        return False, None
+
+    elif hierarchy.shape[1] > 1:
+        print("WARNING: more that one arch detected")
+        return False, None
+
     peri = cv.arcLength(c[0], True)
+
     approx = cv.approxPolyDP(c[0], 0.04 * peri, True)
-    (x, y, w, h) = cv.boundingRect(approx)
+
+    # check if shape is a rectangle
+    if approx.shape[0] == 4:
+        (x, y, w, h) = cv.boundingRect(approx)
+    else:
+        print("WARNING: no rectangle found")
+        return False, None
 
     # find point1 and point2
-    center = np.array([x+w/2, y+h/2], dtype=int)
-    point1 = np.array([center[0]+w, center[1]])
-    point2 = np.array([center[0]-w, center[1]])
+    center = np.array([x + w / 2, y + h / 2], dtype=int)
+    point1 = np.array([center[0] + w, center[1]])
+    point2 = np.array([center[0] - w, center[1]])
 
     # draw points on img
     cv.circle(img, point1, 2, (0, 0, 0), 3)
     cv.circle(img, point2, 2, (0, 0, 0), 3)
     cv.circle(img, center, 2, (0, 0, 0), 3)
 
-    # draw center and two positions
+    # show center and two positions on image
     cv.imshow("point1 and point2 of rectangle", img)
     cv.waitKey(0)
     cv.destroyAllWindows()
 
-    return point1, point2
+    positions = point1, point2
+
+    return True, positions
 
 
 def extract_red(img):
@@ -184,6 +203,5 @@ def extract_red(img):
     mask = mask1 | mask2
 
     return mask
-
 
 
