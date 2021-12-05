@@ -50,7 +50,8 @@ def extract_obstacles(img):
     cv.imshow("Contours", im2)
     obstacles = []
     for i in range(len(approximations)):
-        print("approx", i, len(approximations[i]))
+        if __debug__:
+            print("approx", i, len(approximations[i]))
         if len(approximations[i]) < 5:
             obstacles.append(approximations[i])
     im3 = np.zeros(img.shape)
@@ -101,7 +102,13 @@ def annotate_goal(goal_pos, img):
 
 def annotate_arch(arch_pos, img):
     """draws the arch on the provided image"""
-    cv.rectangle(img, arch_pos["top-left"], arch_pos["bot-right"], (255, 0, 0), -1)
+    point1 = arch_pos[len(arch_pos)-2]
+    point2 = arch_pos[len(arch_pos)-1]
+    vec = point2-point1
+    vec_perp = np.transpose(vec)
+    top_left = point1 + vec_perp
+    bot_right = point2 - vec_perp
+    cv.rectangle(img, top_left, bot_right, (0, 0, 255), -1)
 
 
 def convert_vertice(obstacles):
