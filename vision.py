@@ -93,22 +93,21 @@ def annotate_robot(robot_pos, img):
     point2 = [robot_pos[0][0]+math.cos(robot_pos[1]*ROBOT_LINE), robot_pos[0][1]+math.sin(robot_pos[1]*ROBOT_LINE)]
     point2 = tuple(point2)
     cv.line(img, robot_pos[0], point2, (0, 0, 255), 3)
+    cv.putText(img, "Thymio", robot_pos[0], cv.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
 
 
 def annotate_goal(goal_pos, img):
     """draws the goal on the provided image"""
-    cv.circle(img, goal_pos, 50, (0, 255, 0), -1)
+    cv.circle(img, (goal_pos[0], goal_pos[1]), goal_pos[2], (0, 255, 0), -1)
+    cv.putText(img, "Goal", (goal_pos[0], goal_pos[1]), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
 
 def annotate_arch(arch_pos, img):
-    """draws the arch on the provided image"""
+    """draws the way through the arch on the provided image"""
     point1 = arch_pos[len(arch_pos)-2]
     point2 = arch_pos[len(arch_pos)-1]
-    vec = point2-point1
-    vec_perp = np.transpose(vec)
-    top_left = point1 + vec_perp
-    bot_right = point2 - vec_perp
-    cv.rectangle(img, top_left, bot_right, (0, 0, 255), -1)
+    cv.line(img, point1, point2, (0, 0, 255), -1)
+    cv.putText(img, "arch", ((arch_pos[0][0]+arch_pos[0][1])/2, arch_pos[1]), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
 
 
 def convert_vertice(obstacles):

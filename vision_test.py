@@ -39,12 +39,9 @@ while True:
             found_goal, goal_pos = pos.get_goal_position(cropped_img)
             if found_goal:
                 vis.annotate_goal(goal_pos, im3)
-            arch_pos = pos.get_arch_positions(cropped_img)
-            vis.annotate_arch(arch_pos, im3)
-            #found_arch, arch_pos = pos.get_arch_positions(cropped_img)
-            #print(found_arch)
-            #if found_arch:
-            #    vis.annotate_arch(arch_pos, im3)
+            found_arch, arch_pos = pos.get_arch_positions(cropped_img)
+            if found_arch:
+                vis.annotate_arch(arch_pos, im3)
             cv.imshow("environment", im3)
     else:
         print("There was a problem in the capture")
