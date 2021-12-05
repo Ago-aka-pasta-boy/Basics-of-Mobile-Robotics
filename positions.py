@@ -146,9 +146,25 @@ def get_arch_positions(img):
 
     # detect rectangle
     c, hierarchy = cv.findContours(mask, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
+
+    if hierarchy is None:
+        print("WARNING: no arch found")
+        return False, None
+
+    elif hierarchy.shape[1] > 1:
+        print("WARNING: more that one arch detected")
+        return False, None
+
     peri = cv.arcLength(c[0], True)
+
     approx = cv.approxPolyDP(c[0], 0.04 * peri, True)
-    (x, y, w, h) = cv.boundingRect(approx)
+
+    # check if shape is a rectangle
+    if approx.shape[0] == 4:
+        (x, y, w, h) = cv.boundingRect(approx)
+    else:
+        print("WARNING: no rectangle found")
+        return False, None
 
     # find point1 and point2
     center = np.array([x+w/2, y+h/2], dtype=int)
@@ -160,12 +176,14 @@ def get_arch_positions(img):
     cv.circle(img, point2, 2, (0, 0, 0), 3)
     cv.circle(img, center, 2, (0, 0, 0), 3)
 
-    # draw center and two positions
+    # show center and two positions on image
     cv.imshow("point1 and point2 of rectangle", img)
     cv.waitKey(0)
     cv.destroyAllWindows()
 
-    return point1, point2
+    positions = point1, point2
+
+    return True, positions
 
 
 def extract_red(img):
