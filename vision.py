@@ -8,7 +8,7 @@ ROBOT_LINE = 50
 
 def crop_map(img):
     """crop the black borders out of the image to have a clean image to work on"""
-    max_crop = 100
+    max_crop = 20
     thresh = 100
     crop = 0
     img_gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
@@ -81,7 +81,7 @@ def expand_obstacles(obstacles):
 
 def annotate_path(path, img):
     """draws a line from start to end on the provided image"""
-    for vert in path-1:
+    for vert in range(len(path)-1):
         cv.line(img, path[vert], path[vert+1], (255, 255, 255), 3)
 
 
@@ -103,8 +103,9 @@ def annotate_arch(arch_pos, img):
     """draws the way through the arch on the provided image"""
     point1 = arch_pos[len(arch_pos)-2]
     point2 = arch_pos[len(arch_pos)-1]
-    cv.line(img, point1, point2, (0, 0, 255), -1)
-    cv.putText(img, "arch", ((arch_pos[0][0]+arch_pos[0][1])/2, arch_pos[1]), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+    cv.line(img, point1, point2, (0, 0, 255), 2)
+    # (arch_pos[0][0] + arch_pos[0][1]) / 2, arch_pos[1]
+    cv.putText(img, "arch", point1, cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
 
 
 def convert_vertice(obstacles):
@@ -116,3 +117,4 @@ def convert_vertice(obstacles):
             conv.append(tuple(obstacles[c][d][0]))
         converted_vertice.append(conv)
     return converted_vertice
+

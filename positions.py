@@ -132,7 +132,7 @@ def get_arch_positions(img):
         if (cv.arcLength(c[count], True) < 1000) & (cv.arcLength(c[count], True) > 200):
             approx.append(cv.approxPolyDP(c[count], epsilon, closed=True))
 
-    if len(approx) is None:
+    if len(approx) == 0:
         print("WARNING: no red shape found")
         return False, None
 
