@@ -18,8 +18,7 @@ def crop_map(img):
         crop = i                                                                    # black dots
         cropped = img_filtered[i:-i, i:-i]
         ret, temp = cv.threshold(cropped, thresh, 255, cv.THRESH_BINARY_INV)
-        if __debug__:
-            cv.imshow("Thresholded", temp)
+        # cv.imshow("Thresholded", temp)        # uncomment to debug
         if np.sum(temp[1, :]) < 10 or np.sum(temp[temp.shape[0]-1, :]) < 10 or\
                 np.sum(temp[:, 1]) < 10 or np.sum(temp[:, temp.shape[1]-1]) < 10:
             break
@@ -50,8 +49,7 @@ def extract_obstacles(img):
     cv.imshow("Contours", im2)
     obstacles = []
     for i in range(len(approximations)):
-        if __debug__:
-            print("approx", i, len(approximations[i]))
+        # print("approx", i, len(approximations[i]))        # uncomment to debug
         if len(approximations[i]) < 5:
             obstacles.append(approximations[i])
     im3 = np.zeros(img.shape)
