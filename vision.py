@@ -50,7 +50,7 @@ def extract_obstacles(img):
     obstacles = []
     for i in range(len(approximations)):
         # print("approx", i, len(approximations[i]))        # uncomment to debug
-        if len(approximations[i]) < 5:
+        if (len(approximations[i]) < 5) and (len(approximations[i]) > 3):
             obstacles.append(approximations[i])
     im3 = np.zeros(img.shape)
     cv.drawContours(im3, obstacles, -1, (0, 255, 0), 3)
@@ -111,8 +111,8 @@ def annotate_arch(arch_pos, img):
 def convert_vertice(obstacles):
     """convert the base listing of opencv for contours into an array of arrays of tuples used in global navigation"""
     converted_vertice = []
-    conv = []
-    for c in range(len(obstacles)):
+    for c in range(np.size(obstacles, 0)):
+        conv = []
         for d in range(len(obstacles[c])):
             conv.append(tuple(obstacles[c][d][0]))
         converted_vertice.append(conv)
