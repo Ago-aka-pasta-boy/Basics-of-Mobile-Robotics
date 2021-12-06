@@ -14,6 +14,7 @@ Outputs:
 """
 import numpy as np
 import math
+from scipy.interpolate import interp1d
 
 def kalmanfilter(state,Sigma,motorspeed,history, camera, Ts):
     #Main function to be used
@@ -99,10 +100,26 @@ def update(state, Sigma, motorspeed, history, camera):
 def calibrate_motorspeed(motorspeed):
     #convert motor speed to linear speed (m/s)
     
-    #need to implement a function for calibration (interpolation between known points)
+    #measurements done in a 2.51m long corridor
+    distance = 2.51                                 #length of corridor [m]
+    thymio_instruction = [50,100,150,200,250,300]   #instruction given
+    chrono = [140,119,54,41,33,27]                  #time to cross corridor [s]
+    lin_speed = [distance/t for t in chrono]        #speed [m/s]
     
+    thymio_instruction.insert(0,0)                  #0 instruction = 0 speed
+    lin_speed.insert(0,0)
     
-    motorspeed = np.array([[motorspeed[0]],[motorspeed[1]]]) #convert to 2-by-1 np.array
+    #interpolate to convert instructions (motorspeed) to linear speed
+    f = interp1d(thymio_instruction, lin_speed)
+    
+    instructionR = motorspeed[0]
+    instructionL = motorspeed[1]
+ 
+    speedR = f(instructionR).item()
+    speedL = f(instructionL).item()
+    
+    #return a 2-by-1 np.array
+    motorspeed = np.array([[speedR],[speedL]]) 
     return motorspeed
 
 
@@ -118,7 +135,7 @@ Sigma0 = np.diag([0.01,0.01,0.01])
 N = 15 #size of history
 history = [np.reshape(state0,(1,3))]*N
 
-motorspeed = [1,1] #command sent to Thymio
+motorspeed = [120,120] #command sent to Thymio
 camera = [(0,0),0,True] #live output of the camera
 Ts = 0.1 #sampling time
 
