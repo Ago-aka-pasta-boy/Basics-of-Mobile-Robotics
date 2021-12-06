@@ -31,28 +31,6 @@ def detect_circles(img, lower_range, upper_range):
         return None
 
     # draw circles
-    """"    
-    output = img.copy
-    
-    for (x, y, r) in circles:
-        radius_map[r].append((x, y, r))
-        
-    for x, y, r in circles[0,:]:
-        cv.circle(output, (x, y), r, (0, 255, 0), 4)
-        cv.imshow("circles in green", output)
-    """
-    """
-    for (x, y, r) in circles:
-        radius_map[r].append((x, y, r))
-    
-    for key in radius_map:
-        if len(radius_map[key]) > 0:
-            output = img.copy()
-            for x, y, r in radius_map[key]:
-                cv.circle(output, (x, y), r, (0, 255, 0), 4)
-                cv.imshow(f"Radius {key}", output)
-    """
-
     output = cv.cvtColor(gray, cv.COLOR_GRAY2BGR)
     circles = np.uint16(np.around(circles))
     for i in circles[0, :]:
@@ -70,7 +48,7 @@ def detect_circles(img, lower_range, upper_range):
 
     return circles
 
-# return position of the goal (x,y)
+""" return position of the goal (x,y)"""
 def get_goal_position(img):
     # color value for green in hsv
     lower_green = np.array([35, 50, 0])
@@ -95,7 +73,7 @@ def get_goal_position(img):
     return True, center
 
 
-# return robot position (x,y) + angle between -pi and pi
+""" return robot position (x,y) + angle between -pi and pi"""
 def get_robot_position(img):
     # mask for blue color in hsv:
     lower_blue = np.array([85, 50, 0])
@@ -139,30 +117,32 @@ def get_arch_positions(img):
     mask = extract_red(img)
 
     # blur image
-    blurred = cv.blur(mask, (3, 3))
+    blurred = cv.blur(mask, (5, 5))
 
     # cv.imshow("image blurred", blurred)
     # cv.waitKey(0)
     # cv.destroyAllWindows()
 
     # detect rectangle
-    c, hierarchy = cv.findContours(mask, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
+    c, hierarchy = cv.findContours(mask, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)
 
-    if hierarchy is None:
-        print("WARNING: no arch found")
+    approx = []
+    for count in range(len(c)):
+        epsilon = 0.03 * cv.arcLength(c[count], True)
+        if (cv.arcLength(c[count], True) < 1000) & (cv.arcLength(c[count], True) > 200):
+            approx.append(cv.approxPolyDP(c[count], epsilon, closed=True))
+
+    if len(approx) is None:
+        print("WARNING: no red shape found")
         return False, None
 
-    elif hierarchy.shape[1] > 1:
-        print("WARNING: more that one arch detected")
+    elif len(approx) > 1:
+        print("WARNING: more than one red shape detected")
         return False, None
-
-    peri = cv.arcLength(c[0], True)
-
-    approx = cv.approxPolyDP(c[0], 0.04 * peri, True)
 
     # check if shape is a rectangle
-    if approx.shape[0] == 4:
-        (x, y, w, h) = cv.boundingRect(approx)
+    if len(approx[0]) == 4:
+        (x, y, w, h) = cv.boundingRect(approx[0])
     else:
         print("WARNING: no rectangle found")
         return False, None
