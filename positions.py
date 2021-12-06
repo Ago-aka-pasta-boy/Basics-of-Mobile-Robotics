@@ -19,13 +19,13 @@ def detect_circles(img, lower_range, upper_range):
 
     # blur image
     blurred = cv.blur(img_masked, (5, 5))
-    cv.imshow("image blurred", blurred)
-    cv.waitKey(0)
-    cv.destroyAllWindows()
+    # cv.imshow("image blurred", blurred)
+    # cv.waitKey(0)
+    # cv.destroyAllWindows()
 
     # detect circles
     circles = cv.HoughCircles(blurred, cv.HOUGH_GRADIENT, 1, 20,
-                                param1=50, param2=30, minRadius=5, maxRadius=100)
+                                param1=50, param2=30, minRadius=3, maxRadius=100)
     if circles is None:
         print("no circle found")
         return None
@@ -61,9 +61,9 @@ def detect_circles(img, lower_range, upper_range):
         # draw the center of the circle
         cv.circle(output, (i[0], i[1]), 2, (0, 0, 255), 3)
 
-    cv.imshow("detected circles", output)
-    cv.waitKey(0)
-    cv.destroyAllWindows()
+    # cv.imshow("detected circles", output)
+    # cv.waitKey(0)
+    # cv.destroyAllWindows()
 
     # convert the (x, y) coordinates and radius of the circles to integers
     circles = np.round(circles[0, :]).astype("int")
@@ -102,6 +102,7 @@ def get_robot_position(img):
     upper_blue = np.array([130, 255, 255])
 
     circles = detect_circles(img, lower_blue, upper_blue)
+    print(circles)
 
     if circles is None:
         print("no circle found")
@@ -111,7 +112,7 @@ def get_robot_position(img):
     nb_circles = dim[0]
     print("\ncoordinates of circle is:", circles, "\nnumber of circles detected is:", nb_circles)
 
-    if nb_circles > 2:
+    if (nb_circles > 2) or (nb_circles == 1):
         print("number of circles found", nb_circles)
         return False, None
 
@@ -140,9 +141,9 @@ def get_arch_positions(img):
     # blur image
     blurred = cv.blur(mask, (3, 3))
 
-    cv.imshow("image blurred", blurred)
-    cv.waitKey(0)
-    cv.destroyAllWindows()
+    # cv.imshow("image blurred", blurred)
+    # cv.waitKey(0)
+    # cv.destroyAllWindows()
 
     # detect rectangle
     c, hierarchy = cv.findContours(mask, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
@@ -172,14 +173,14 @@ def get_arch_positions(img):
     point2 = np.array([center[0]-w, center[1]])
 
     # draw points on img
-    cv.circle(img, point1, 2, (0, 0, 0), 3)
-    cv.circle(img, point2, 2, (0, 0, 0), 3)
-    cv.circle(img, center, 2, (0, 0, 0), 3)
+    # cv.circle(img, point1, 2, (0, 0, 0), 3)
+    # cv.circle(img, point2, 2, (0, 0, 0), 3)
+    # cv.circle(img, center, 2, (0, 0, 0), 3)
 
     # show center and two positions on image
-    cv.imshow("point1 and point2 of rectangle", img)
-    cv.waitKey(0)
-    cv.destroyAllWindows()
+    # cv.imshow("point1 and point2 of rectangle", img)
+    # cv.waitKey(0)
+    # cv.destroyAllWindows()
 
     positions = point1, point2
 
