@@ -95,7 +95,7 @@ def annotate_robot(robot_pos, img):
 
 def annotate_goal(goal_pos, img):
     """draws the goal on the provided image"""
-    cv.circle(img, (goal_pos[0], goal_pos[1]), goal_pos[2], (0, 255, 0), -1)
+    cv.circle(img, (goal_pos[0], goal_pos[1]), 30, (0, 255, 0), -1)
     cv.putText(img, "Goal", (goal_pos[0], goal_pos[1]), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
 
