@@ -44,8 +44,8 @@ def find_shortest_path(obstacle_vertices, list_neighbours, start=("unspecified",
         heuristic.insert(0,dist(goal,start))
 
     #attribute initial weights to each vertex
-    infinity = 100000
-    weights_djikstra = [infinity]*(N+2)                                         # minimal distance to reach each vertex from start. Before exploration, =infinity
+    INFINITY = 100000
+    weights_djikstra = [INFINITY]*(N+2)                                         # minimal distance to reach each vertex from start. Before exploration, = INFINITY
     weights_astar = weights_djikstra.copy()                                     # weights_astar = weights_djikstra + heuristic
     weights_djikstra[0] = 0
     weights_astar[0] = heuristic[0]
