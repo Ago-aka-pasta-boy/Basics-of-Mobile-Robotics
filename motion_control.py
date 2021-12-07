@@ -1,6 +1,4 @@
-import vision as vis
 import positions as pos
-import shortest_path as short
 import math
 
 KP = 2
@@ -23,6 +21,8 @@ def speed_control(err):
         # go straight
         motor_left_target = NORMAL_SPEED
         motor_right_target = NORMAL_SPEED
+
+    return motor_left_target, motor_right_target
 
 
 def get_error(img, next_goal):
