@@ -27,14 +27,20 @@ import math
 sys.path.insert(1, 'Global_navigation')
 import global_path
 
-def find_shortest_path(obstacle_vertices, list_neighbours, start=("unspecified","unspecified"), goal=("unspecified","unspecified")):
+def find_shortest_path(obstacle_vertices, start=("unspecified","unspecified"), goal=("unspecified","unspecified")):
     # 1. Initialisation
-    
+    #find all neighbours
+    list_neighbours = global_path.find_all_paths(obstacle_vertices, start, goal)
+
     #attribute a name to each vertex: start (vertex 0), obstacle vertices (vertices 1...N), and goal (vertex N+1)
     obstacle_vertices_flattened = [item for sublist in obstacle_vertices for item in sublist]
     N = len(obstacle_vertices_flattened)                                            
     name_vertices = list(range(N+2))
-    
+    print("Start {}".format(start))
+    print("Goal {}".format(goal))
+    print("Vertices {}".format(obstacle_vertices))
+    print("list neighbours {}".format(list_neighbours))
+
     #attribute heuristics to each vertex (Euclidean distance if A*, 0 otherwise)
     heuristic = get_heuristics(N, obstacle_vertices_flattened, start, goal)
 
@@ -64,8 +70,11 @@ def find_shortest_path(obstacle_vertices, list_neighbours, start=("unspecified",
         
     # 3. Retrace the best path going backwards (origin = where we came from. predecessor = best origin for a given vertex)
     names_full_path = []
+    print("test")
+    print("predecessors {}".format(predecessors))
     origin = predecessors[-1]                      #predecessor of goal
     while origin!="reached_start":
+        print(origin)
         names_full_path.insert(0,origin)           #insert predecessor of vertex i
         origin = predecessors[origin]              #for next loop: change the value of "origin"
     names_full_path.append(name_vertices[-1])      #add vertex "goal" to the names_full_path
@@ -193,7 +202,7 @@ def names_to_subpaths(names_path, list_vertices, start, goal):
     subgoals = [vertex for vertex in coords]
     subgoals.pop(0)
 
-    return substarts_x, substarts_y, subgoals
+    return coords, substarts_x, substarts_y, subgoals
 
 
 #----------------------------
