@@ -3,12 +3,10 @@ import math
 KP = 150
 EPSILON = 0.1  # 15 pixels
 NORMAL_SPEED = 150
-<<<<<<< HEAD
 MAX_DIV = 1
 
-=======
 POSITION_ERROR = 5
->>>>>>> 8d52ff2389e11b2910bc786921731a7bbc43a5fb
+
 
 def speed_control(err):
     if err < -EPSILON:
