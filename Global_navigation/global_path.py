@@ -160,12 +160,10 @@ def obtain_list_sides(list_vertices):
     
     
     #step 1: obtain the number of sides of each obstacle
-    length_obstacles = []
-    for obstacle in list_vertices:
-        length_obstacles.append(len(obstacle))
+    length_obstacles = [len(obstacle) for obstacle in list_vertices]
         
     #step 2: convert indexing of vertices from [0][0],[0][1],... into 1,2,3,...,N 
-    #(0 and N+1 are start and goal respectively)
+    #by introducing a shift (0 and N+1 are start and goal respectively)
     
     #then enter every tuple (side.vertex1, side.vertex2) into sides_obstacle
     #then enter sides_obstacle into list_sides
