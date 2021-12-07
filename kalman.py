@@ -16,11 +16,22 @@ import numpy as np
 import math
 from scipy.interpolate import interp1d
 
-def kalmanfilter(state,Sigma,motorspeed,history, camera, Ts):
+AXLE_LENGTH = 0.095
+
+STD_WHEELSPEED = 0.01       #std dev. for actual vs. expected linear speed of wheels
+STD_MEASURE_COORDS = 0.01
+STD_MEASURE_THETA = 0.01
+
+THRESHOLD_DISTANCE = 10
+THRESHOLD_THETA = 0.8
+
+
+
+def kalmanfilter(state,Sigma,motorspeed,history, camera, Ts, meters_to_pixels):
     #Main function to be used
     
     #convert thymio motorspeed to linear speed (calibration)
-    motorspeed = calibrate_motorspeed(motorspeed) 
+    motorspeed = calibrate_motorspeed(motorspeed, meters_to_pixels)
     
     #predict next step
     state, Sigma, history = predict(state, Sigma, motorspeed, history, Ts)
@@ -38,16 +49,12 @@ def predict(state, Sigma, motorspeed, history, Ts):
         #y_k = Cx_k
     #note: f is linearized to obtain B
     
-    #parameters
-    std_wheelspeed = 0.01   #std dev. for actual vs. expected linear speed of wheels
-    L = 0.095               #axle length
-    
     #initialize Q (noise due to wheels) and A
-    Q = np.random.normal(0.0, std_wheelspeed, (2,1))
+    Q = np.random.normal(0.0, STD_WHEELSPEED, (2,1))
     A = np.array([[1.,0.,0.],[0.,1.,0.],[0.,0.,1.]])    
     
     #obtain B
-    theta_new = state[2] + Ts*(motorspeed[0]-motorspeed[1])/(2*L) #only used to calculate B
+    theta_new = state[2] + Ts*(motorspeed[0]-motorspeed[1])/(2*AXLE_LENGTH) #only used to calculate B
     B = 0.5*np.array([[math.cos(theta_new),math.cos(theta_new)],\
                       [math.sin(theta_new),math.sin(theta_new)],\
                           [1/L, -1/L]])
@@ -65,20 +72,13 @@ def predict(state, Sigma, motorspeed, history, Ts):
 
 
 def update(state, Sigma, motorspeed, history, camera):
-    #parameters: 
-        #thresholds to discard wrong values from camera
-        #measurement noise
-    threshold_distance = 10
-    threshold_theta = 10
-    std_measure_coords = 0.01
-    std_measure_theta = 0.01
     
     #initialize matrices
     avg_history = np.mean(history,0)
     C = np.array([[1.,0.,0.],[0.,1.,0.],[0.,0.,1.]]) #y_k = C*x_k
-    R = np.diag([np.random.normal(0.0, std_measure_coords), \
-                 np.random.normal(0.0, std_measure_coords), \
-                 np.random.normal(0.0, std_measure_theta)]) #measure noise
+    R = np.diag([np.random.normal(0.0, STD_MEASURE_COORDS), \
+                 np.random.normal(0.0, STD_MEASURE_COORDS), \
+                 np.random.normal(0.0, STD_MEASURE_THETA)]) #measure noise
     
     #calculate updated state
     y = np.array([[camera[0][0]], [camera[0][1]], [camera[1]]])  #measured states
@@ -89,15 +89,15 @@ def update(state, Sigma, motorspeed, history, camera):
     state_update = state + K @ innov
     
     #if the measured value is obviously wrong, then do NOT proceed to update
-    if np.linalg.norm(state_update[0:1] - avg_history[0:1]) < threshold_distance\
-            and abs(state_update[2] - avg_history[0][2]) < threshold_theta:
+    if np.linalg.norm(state_update[0:1] - avg_history[0:1]) < THRESHOLD_DISTANCE\
+            and abs(state_update[2] - avg_history[0][2]) < THRESHOLD_THETA:
                 state = state_update
                 Sigma = (np.eye(3) - K@C) @ Sigma
     
     return state, Sigma
 
 
-def calibrate_motorspeed(motorspeed):
+def calibrate_motorspeed(motorspeed, meters_to_pixels):
     #convert motor speed to linear speed (m/s)
     
     #measurements done in a 2.51m long corridor
@@ -112,14 +112,17 @@ def calibrate_motorspeed(motorspeed):
     #interpolate to convert instructions (motorspeed) to linear speed
     f = interp1d(thymio_instruction, lin_speed)
     
-    instructionR = motorspeed[0]
-    instructionL = motorspeed[1]
+    speedRThymio = motorspeed[0]
+    speedLThymio = motorspeed[1]
  
-    speedR = f(instructionR).item()
-    speedL = f(instructionL).item()
+    speedRMetric = f(speedRThymio).item()
+    speedLMetric = f(speedLThymio).item()
+
+    speedRPixels = int(speedRMetric * meters_to_pixels)
+    speedLPixels = int(speedLMetric * meters_to_pixels)
     
     #return a 2-by-1 np.array
-    motorspeed = np.array([[speedR],[speedL]]) 
+    motorspeed = np.array([[speedRPixels],[speedLPixels]])
     return motorspeed
 
 
@@ -129,6 +132,8 @@ def calibrate_motorspeed(motorspeed):
 
 
 #Test: movement in straight line at 45°, camera measures x=y=theta=0 always
+meters_to_pixels = 1
+
 state0 = np.array([[0],[0],[45*math.pi/180]]) #3-by-1 np.array
 Sigma0 = np.diag([0.01,0.01,0.01])
 
@@ -140,7 +145,7 @@ camera = [(0,0),0,True] #live output of the camera
 Ts = 0.1 #sampling time
 
 #test it
-state, Sigma, history = kalmanfilter(state0,Sigma0,motorspeed,history, camera, Ts)
+state, Sigma, history = kalmanfilter(state0,Sigma0,motorspeed,history, camera, Ts, meters_to_pixels)
 iter = 1
 print("Iteration {}".format(iter))
 print("State {}".format(state))
@@ -148,7 +153,7 @@ print("Sigma {}".format(Sigma))
 #print("History {}".format(history))
 print("\n \n")
 for k in range(5):
-    state, Sigma, history = kalmanfilter(state,Sigma,motorspeed,history, camera, Ts)
+    state, Sigma, history = kalmanfilter(state,Sigma,motorspeed,history, camera, Ts, meters_to_pixels)
     iter += 1
     print("Iteration {}".format(iter))
     print("State {}".format(state))
