@@ -8,7 +8,7 @@ ROBOT_LINE = 50
 
 def crop_map(img):
     """crop the black borders out of the image to have a clean image to work on"""
-    max_crop = 40
+    max_crop = 3
     thresh = 100
     crop = 0
     img_gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)

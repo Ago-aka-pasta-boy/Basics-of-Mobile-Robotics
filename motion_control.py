@@ -12,12 +12,12 @@ def speed_control(err):
     if err < -EPSILON:
         # turn right
         motor_left = NORMAL_SPEED + KP*abs(err)
-        motor_right = -(NORMAL_SPEED + KP*abs(err))
+        motor_right = NORMAL_SPEED - KP*abs(err)
         print("first if")
 #/(max(abs(err),MAX_DIV))
     elif err > EPSILON: 
     # turn left     
-        motor_left =-( NORMAL_SPEED + KP * abs(err))
+        motor_left = NORMAL_SPEED - KP * abs(err)
         motor_right = NORMAL_SPEED + KP * abs(err)
         print("second if")
 
@@ -43,6 +43,7 @@ def get_error(robot_pos, next_goal):
 
 def check_robot_arrived(robot_pos, next_goal):
     if math.dist(robot_pos[0], next_goal) < POSITION_ERROR:
+        print("eureka en grand")
         return True
 
     else:
