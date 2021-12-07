@@ -67,8 +67,9 @@ def get_goal_position(img):
         return False, None
 
     center = circle[0, 0:2]
+    radius = circle[0][2]
 
-    return True, center
+    return True, center, radius
 
 
 """ return robot position (x,y) + angle between -pi and pi"""
@@ -196,6 +197,15 @@ def extract_red(img):
     mask = mask1 | mask2
 
     return mask
+
+
+def convert_meter2pxl(radius_pxl):
+    radius_m = 0.07
+    scale = radius_pxl/radius_m
+
+    return scale
+
+
 
 
 
