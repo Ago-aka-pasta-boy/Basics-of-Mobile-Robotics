@@ -59,8 +59,7 @@ def get_goal_position(img):
         print("WARNING: no goal position found")
         return False, None
 
-    dim = circle.shape
-    nb_circles = dim[0]
+    nb_circles = circle.shape[0]
     #print("\ncoordinates of goal position is:", circle, "\nnumber of goal detected is:", nb_circles)
 
     if nb_circles > 1:
@@ -68,6 +67,7 @@ def get_goal_position(img):
         return False, None
 
     center = circle[0, 0:2]
+
     return True, center
 
 
@@ -83,16 +83,19 @@ def get_robot_position(img):
         print("WARNING: robot not found")
         return False, None
 
-    dim = circles.shape
-    nb_circles = dim[0]
+    nb_circles = circles.shape[0]
     #print("\ncoordinates of circle is:", circles, "\nnumber of circles detected is:", nb_circles)
 
-    if (nb_circles > 2) or (nb_circles == 1):
+    if nb_circles > 2:
         print("WARNING: more than 2 circles found for robot position", nb_circles)
         return False, None
 
+    elif nb_circles == 1:
+        print("WARNING: only one circle found for robot position", nb_circles)
+        return False, None
+
     # direction of the robot
-    if nb_circles == 2:
+    elif nb_circles == 2:
         if circles[0, 2] > circles[1, 2]:
             point = circles[0, 0:2]
             dy = circles[0,1]-circles[1,1]
@@ -145,6 +148,7 @@ def get_arch_positions(img):
         mu02 = M["m02"]/M["m00"]-math.pow(cy,2)
         mu20 = M["m20"]/M["m00"]-math.pow(cx,2)
 
+        # angle between -90° and 90° counter clockwise
         angle = -0.5*math.atan2(2*mu11,mu20-mu02)
         #print("\nangle is", angle)
 
