@@ -9,7 +9,6 @@ def detect_circles(img, lower_range, upper_range):
 
     # threshold colored circles
     mask = cv.inRange(hsv, lower_range, upper_range)
-    mask_inv = cv.bitwise_not(mask)
 
     # convert img from rgb to grayscale
     gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
