@@ -1,37 +1,34 @@
-import positions as pos
 import math
 
-KP = 2
-EPSILON = 15  # 15 pixels
+KP = 10
+EPSILON = 0.1  # 15 pixels
 NORMAL_SPEED = 150
 
 
 def speed_control(err):
     if err < -EPSILON:
         # turn right
-        motor_left_target = KP*err
-        motor_right_target = -KP*err
+        motor_left = NORMAL_SPEED/err + KP*err
+        motor_right = NORMAL_SPEED/err - KP*err
 
     elif err > EPSILON:
         # turn left
-        motor_left_target = -KP * err
-        motor_right_target = KP * err
+        motor_left = NORMAL_SPEED/err - KP * err
+        motor_right = NORMAL_SPEED/err + KP * err
 
     else:
         # go straight
-        motor_left_target = NORMAL_SPEED
-        motor_right_target = NORMAL_SPEED
+        motor_left = NORMAL_SPEED
+        motor_right = NORMAL_SPEED
 
-    return motor_left_target, motor_right_target
+    return motor_left, motor_right
 
 
-def get_error(img, next_goal):
-    robot_pos = pos.get_robot_position(img)
+def get_error(robot_pos, next_goal):
+    alpha = robot_pos[1]
 
-    alpha = robot_pos[1,0]
-
-    dy = robot_pos[0,1]-next_goal[1]
-    dx = next_goal[0]-robot_pos[0,0]
+    dy = robot_pos[0][1]-next_goal[1]
+    dx = next_goal[0]-robot_pos[0][0]
     beta = math.atan2(dy, dx)
 
     err = beta-alpha
