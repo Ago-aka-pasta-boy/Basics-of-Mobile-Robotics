@@ -1,20 +1,21 @@
 import math
 
-KP = 10
+KP = 150
 EPSILON = 0.1  # 15 pixels
 NORMAL_SPEED = 150
+MAX_DIV = 1
 
 
 def speed_control(err):
     if err < -EPSILON:
         # turn right
-        motor_left = NORMAL_SPEED/err + KP*err
-        motor_right = NORMAL_SPEED/err - KP*err
+        motor_left = NORMAL_SPEED/(max(abs(err),MAX_DIV)) + KP*err
+        motor_right = NORMAL_SPEED/(max(abs(err),MAX_DIV)) - KP*err
 
     elif err > EPSILON:
         # turn left
-        motor_left = NORMAL_SPEED/err - KP * err
-        motor_right = NORMAL_SPEED/err + KP * err
+        motor_left = NORMAL_SPEED/(max(abs(err),MAX_DIV)) - KP * err
+        motor_right = NORMAL_SPEED/(max(abs(err),MAX_DIV)) + KP * err
 
     else:
         # go straight
