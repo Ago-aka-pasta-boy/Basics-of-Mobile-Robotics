@@ -4,7 +4,7 @@ import math
 KP = 2
 EPSILON = 15  # 15 pixels
 NORMAL_SPEED = 150
-
+POSITION_ERROR = 5
 
 def speed_control(err):
     if err < -EPSILON:
@@ -38,5 +38,12 @@ def get_error(img, next_goal):
 
     return err
 
+
+def check_robot_arrived(robot_pos, next_goal):
+    if math.dist(robot_pos[0], next_goal) < POSITION_ERROR:
+        return True
+
+    else:
+        return False
 
 
