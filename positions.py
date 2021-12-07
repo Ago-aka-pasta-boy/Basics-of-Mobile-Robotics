@@ -168,9 +168,9 @@ def get_arch_positions(img):
     cv.circle(img, center, 2, (0, 0, 0), 3)
 
     # show center and two positions on image
-    cv.imshow("point1 and point2 of rectangle", img)
-    cv.waitKey(0)
-    cv.destroyAllWindows()
+    #cv.imshow("point1 and point2 of rectangle", img)
+    #cv.waitKey(0)
+    #cv.destroyAllWindows()
 
     positions = point1, point2
 
