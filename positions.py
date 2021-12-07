@@ -27,7 +27,6 @@ def detect_circles(img, lower_range, upper_range):
     circles = cv.HoughCircles(blurred, cv.HOUGH_GRADIENT, 1, 20,
                                 param1=50, param2=30, minRadius=3, maxRadius=100)
     if circles is None:
-        print("no circle found")
         return None
 
     # draw circles
@@ -58,15 +57,15 @@ def get_goal_position(img):
     circle = detect_circles(img, lower_green, upper_green)
 
     if circle is None:
-        print("no circle found")
+        print("WARNING: no goal position found")
         return False, None
 
     dim = circle.shape
     nb_circles = dim[0]
-    #print("\ncoordinates of circle is:", circle, "\nnumber of circles detected is:", nb_circles)
+    #print("\ncoordinates of goal position is:", circle, "\nnumber of goal detected is:", nb_circles)
 
     if nb_circles > 1:
-        print("number of circles found", nb_circles)
+        print("WARNING: more than one goal position found", nb_circles)
         return False, None
 
     center = circle[0, 0:2]
@@ -80,18 +79,17 @@ def get_robot_position(img):
     upper_blue = np.array([130, 255, 255])
 
     circles = detect_circles(img, lower_blue, upper_blue)
-    print(circles)
 
     if circles is None:
-        print("no circle found")
+        print("WARNING: robot not found")
         return False, None
 
     dim = circles.shape
     nb_circles = dim[0]
-    print("\ncoordinates of circle is:", circles, "\nnumber of circles detected is:", nb_circles)
+    #print("\ncoordinates of circle is:", circles, "\nnumber of circles detected is:", nb_circles)
 
     if (nb_circles > 2) or (nb_circles == 1):
-        print("number of circles found", nb_circles)
+        print("WARNING: more than 2 circles found for robot position", nb_circles)
         return False, None
 
     # direction of the robot
@@ -100,12 +98,11 @@ def get_robot_position(img):
             point = circles[0, 0:2]
             dy = circles[0,1]-circles[1,1]
             dx = circles[1,0]-circles[0,0]
-            print(dy, dx)
+
         else:
             point = circles[1, 0:2]
             dy = circles[1, 1] - circles[0, 1]
             dx = circles[0, 0] - circles[1, 0]
-            print(dy, dx)
 
         angle = math.atan2(dy, dx)
         position = [point, angle]
@@ -119,21 +116,21 @@ def get_arch_positions(img):
     # blur image
     blurred = cv.blur(mask, (5, 5))
 
-    # cv.imshow("image blurred", blurred)
-    # cv.waitKey(0)
-    # cv.destroyAllWindows()
+    #cv.imshow("image blurred", blurred)
+    #cv.waitKey(0)
+    #cv.destroyAllWindows()
 
     # detect rectangle
     c, hierarchy = cv.findContours(mask, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)
 
     approx = []
-    for count in range(len(c)):
-        epsilon = 0.03 * cv.arcLength(c[count], True)
-        if (cv.arcLength(c[count], True) < 1000) & (cv.arcLength(c[count], True) > 200):
-            approx.append(cv.approxPolyDP(c[count], epsilon, closed=True))
+    for i in range(len(c)):
+        epsilon = 0.03 * cv.arcLength(c[i], True)
+        if (cv.arcLength(c[i], True) < 1000) & (cv.arcLength(c[i], True) > 200):
+            approx.append(cv.approxPolyDP(c[i], epsilon, closed=True))
 
-    if len(approx) == 0:
-        print("WARNING: no red shape found")
+    if not approx:
+        print("WARNING: no red shape detected")
         return False, None
 
     elif len(approx) > 1:
@@ -142,25 +139,38 @@ def get_arch_positions(img):
 
     # check if shape is a rectangle
     if len(approx[0]) == 4:
-        (x, y, w, h) = cv.boundingRect(approx[0])
+        M = cv.moments(approx[0])
+        cx = M["m10"] / M["m00"]
+        cy = M["m01"] / M["m00"]
+        mu11 = M["m11"]/M["m00"]-cx*cy
+        mu02 = M["m02"]/M["m00"]-math.pow(cy,2)
+        mu20 = M["m20"]/M["m00"]-math.pow(cx,2)
+
+        angle = -0.5*math.atan2(2*mu11,mu20-mu02)
+        #print("\nangle is", angle)
+
     else:
         print("WARNING: no rectangle found")
         return False, None
 
+    # draw center
+    center = np.array([cx, cy], dtype=int)
+    cv.circle(img, center, 2, (0, 0, 0), 3)
+
     # find point1 and point2
-    center = np.array([x+w/2, y+h/2], dtype=int)
-    point1 = np.array([center[0]+w, center[1]])
-    point2 = np.array([center[0]-w, center[1]])
+    width = min(math.dist(approx[0][0][0], approx[0][1][0]), math.dist(approx[0][1][0], approx[0][2][0]))
+    point1 = np.array([cx + math.sin(angle)*width, cy + math.cos(angle)*width], dtype=int)
+    point2 = np.array([cx - math.sin(angle)*width, cy - math.cos(angle)*width], dtype=int)
 
     # draw points on img
-    # cv.circle(img, point1, 2, (0, 0, 0), 3)
-    # cv.circle(img, point2, 2, (0, 0, 0), 3)
-    # cv.circle(img, center, 2, (0, 0, 0), 3)
+    cv.circle(img, point1, 2, (0, 0, 0), 3)
+    cv.circle(img, point2, 2, (0, 0, 0), 3)
+    cv.circle(img, center, 2, (0, 0, 0), 3)
 
     # show center and two positions on image
-    # cv.imshow("point1 and point2 of rectangle", img)
-    # cv.waitKey(0)
-    # cv.destroyAllWindows()
+    #cv.imshow("point1 and point2 of rectangle", img)
+    #cv.waitKey(0)
+    #cv.destroyAllWindows()
 
     positions = point1, point2
 
