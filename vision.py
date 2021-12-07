@@ -2,13 +2,13 @@ import numpy as np
 import cv2 as cv
 import math
 
-SCALING_FACTOR = 1.2
+SCALING_FACTOR = 40
 ROBOT_LINE = 50
 
 
 def crop_map(img):
     """crop the black borders out of the image to have a clean image to work on"""
-    max_crop = 20
+    max_crop = 40
     thresh = 100
     crop = 0
     img_gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
@@ -32,7 +32,7 @@ def extract_obstacles(img):
     # cv.imshow("second channel", img[:, :, 1])
     # cv.imshow("third channel", img[:, :, 2])
     # RGB input!!
-    thresh = 100
+    thresh = 80
     img_green = img[:, :, 1]
     img_blurred = cv.GaussianBlur(img_green, (5, 5), cv.BORDER_DEFAULT)
     img_filtered = cv.morphologyEx(img_blurred, cv.MORPH_OPEN, np.ones((5, 5)))
@@ -50,7 +50,7 @@ def extract_obstacles(img):
     obstacles = []
     for i in range(len(approximations)):
         # print("approx", i, len(approximations[i]))        # uncomment to debug
-        if (len(approximations[i]) < 5) and (len(approximations[i]) > 3):
+        if (len(approximations[i]) < 6) and (len(approximations[i]) > 2):
             obstacles.append(approximations[i])
     im3 = np.zeros(img.shape)
     cv.drawContours(im3, obstacles, -1, (0, 255, 0), 3)
@@ -74,8 +74,10 @@ def expand_obstacles(obstacles):
         for d in range(len(obstacles[c])):
             vec_x = obstacles[c][d][0][0]-cx
             vec_y = obstacles[c][d][0][1]-cy
-            ex_obstacles[c][d][0][0] = cx + vec_x * SCALING_FACTOR
-            ex_obstacles[c][d][0][1] = cy + vec_y * SCALING_FACTOR
+            vec = np.array([vec_x, vec_y])
+            vec = vec/np.linalg.norm(vec)
+            ex_obstacles[c][d][0][0] = obstacles[c][d][0][0] + vec[0] * SCALING_FACTOR
+            ex_obstacles[c][d][0][1] = obstacles[c][d][0][1] + vec[1] * SCALING_FACTOR
     return ex_obstacles
 
 
@@ -95,8 +97,8 @@ def annotate_robot(robot_pos, img):
 
 def annotate_goal(goal_pos, img):
     """draws the goal on the provided image"""
-    cv.circle(img, (goal_pos[0], goal_pos[1]), 30, (0, 255, 0), -1)
-    cv.putText(img, "Goal", (goal_pos[0], goal_pos[1]), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+    cv.circle(img, (goal_pos[0], goal_pos[1]), 15, (0, 255, 0), -1)
+    cv.putText(img, "Goal", (goal_pos[0]+5, goal_pos[1]+5), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
 
 def annotate_arch(arch_pos, img):

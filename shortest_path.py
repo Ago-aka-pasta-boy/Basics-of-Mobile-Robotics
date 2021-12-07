@@ -188,11 +188,10 @@ def names_to_subpaths(names_path, list_vertices, start, goal):
         """
     obstacle_vertices_flattened = [item for sublist in list_vertices for item in sublist]
     N = len(obstacle_vertices_flattened)
-    
+
     coords = [start]
-    for i in range(N):
-        if i+1 in names_path:
-            coords.append(obstacle_vertices_flattened[i])
+    for i in names_path[1:-1]:
+        coords.append(obstacle_vertices_flattened[i - 1])
     coords.append(goal)
     
     substarts_x = [vertex[0] for vertex in coords]
