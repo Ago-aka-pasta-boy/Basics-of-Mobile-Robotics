@@ -159,8 +159,8 @@ def get_arch_positions(img):
 
     # find point1 and point2
     width = min(math.dist(approx[0][0][0], approx[0][1][0]), math.dist(approx[0][1][0], approx[0][2][0]))
-    point1 = np.array([cx + math.sin(angle)*width, cy + math.cos(angle)*width], dtype=int)
-    point2 = np.array([cx - math.sin(angle)*width, cy - math.cos(angle)*width], dtype=int)
+    point1 = np.array([cx + math.sin(angle)*width*2, cy + math.cos(angle)*width*2], dtype=int)
+    point2 = np.array([cx - math.sin(angle)*width*2, cy - math.cos(angle)*width*2], dtype=int)
 
     # draw points on img
     cv.circle(img, point1, 2, (0, 0, 0), 3)
