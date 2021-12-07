@@ -57,7 +57,7 @@ def predict(state, Sigma, motorspeed, history, Ts):
     theta_new = state[2] + Ts*(motorspeed[0]-motorspeed[1])/(2*AXLE_LENGTH) #only used to calculate B
     B = 0.5*np.array([[math.cos(theta_new),math.cos(theta_new)],\
                       [math.sin(theta_new),math.sin(theta_new)],\
-                          [1/L, -1/L]])
+                          [1/AXLE_LENGTH, -1/AXLE_LENGTH]])
     
     #update history and state (note: @ is the matrix multiplication)
     history = np.roll(history, -1, 0)
@@ -102,12 +102,11 @@ def calibrate_motorspeed(motorspeed, meters_to_pixels):
     
     #measurements done in a 2.51m long corridor
     distance = 2.51                                 #length of corridor [m]
-    thymio_instruction = [50,100,150,200,250,300]   #instruction given
-    chrono = [140,119,54,41,33,27]                  #time to cross corridor [s]
+    thymio_instruction = [-300,-250,-200,-150,-100,-50,50,100,150,200,250,300]   #instruction given
+    chrono = [-27,-33,-41,-54,-119,-140,140,119,54,41,33,27]                  #time to cross corridor [s]
     lin_speed = [distance/t for t in chrono]        #speed [m/s]
     
-    thymio_instruction.insert(0,0)                  #0 instruction = 0 speed
-    lin_speed.insert(0,0)
+
     
     #interpolate to convert instructions (motorspeed) to linear speed
     f = interp1d(thymio_instruction, lin_speed)
@@ -132,31 +131,31 @@ def calibrate_motorspeed(motorspeed, meters_to_pixels):
 
 
 #Test: movement in straight line at 45°, camera measures x=y=theta=0 always
-meters_to_pixels = 1
+# meters_to_pixels = 1
 
-state0 = np.array([[0],[0],[45*math.pi/180]]) #3-by-1 np.array
-Sigma0 = np.diag([0.01,0.01,0.01])
+# state0 = np.array([[0],[0],[45*math.pi/180]]) #3-by-1 np.array
+# Sigma0 = np.diag([0.01,0.01,0.01])
 
-N = 15 #size of history
-history = [np.reshape(state0,(1,3))]*N
+# N = 15 #size of history
+# history = [np.reshape(state0,(1,3))]*N
 
-motorspeed = [120,120] #command sent to Thymio
-camera = [(0,0),0,True] #live output of the camera
-Ts = 0.1 #sampling time
+# motorspeed = [120,120] #command sent to Thymio
+# camera = [(0,0),0,True] #live output of the camera
+# Ts = 0.1 #sampling time
 
-#test it
-state, Sigma, history = kalmanfilter(state0,Sigma0,motorspeed,history, camera, Ts, meters_to_pixels)
-iter = 1
-print("Iteration {}".format(iter))
-print("State {}".format(state))
-print("Sigma {}".format(Sigma))
-#print("History {}".format(history))
-print("\n \n")
-for k in range(5):
-    state, Sigma, history = kalmanfilter(state,Sigma,motorspeed,history, camera, Ts, meters_to_pixels)
-    iter += 1
-    print("Iteration {}".format(iter))
-    print("State {}".format(state))
-    print("Sigma {}".format(Sigma))
-    #print("History {}".format(history))
-    print("\n \n")
+# #test it
+# state, Sigma, history = kalmanfilter(state0,Sigma0,motorspeed,history, camera, Ts, meters_to_pixels)
+# iter = 1
+# print("Iteration {}".format(iter))
+# print("State {}".format(state))
+# print("Sigma {}".format(Sigma))
+# #print("History {}".format(history))
+# print("\n \n")
+# for k in range(5):
+#     state, Sigma, history = kalmanfilter(state,Sigma,motorspeed,history, camera, Ts, meters_to_pixels)
+#     iter += 1
+#     print("Iteration {}".format(iter))
+#     print("State {}".format(state))
+#     print("Sigma {}".format(Sigma))
+#     #print("History {}".format(history))
+#     print("\n \n")
