@@ -35,7 +35,7 @@ def find_all_paths(list_vertices, start, goal):
     #store them without any distinction between obstacles/start/goal
     #every entry is an instance of class Point (see check_intersection.py)
     list_points = flatten_list_points(list_vertices, start, goal)
-    N = len(list_points) - 2    #number of obstacle vertices
+    nb_vertices = len(list_points) - 2
     
     #extract list_sides, the list of all obstacle sides e.g. (vertex1,vertex2),(vertex2,vertex3),etc
     #list_sides is grouped by obstacle:  list_sides = [[obstacle1.sides], [obstacle2.sides], ...]
@@ -57,10 +57,10 @@ def find_all_paths(list_vertices, start, goal):
     dist = lambda x1,y1,x2,y2: math.sqrt((x1-x2)**2 + (y1-y2)**2)
     
     list_neighbours = []                        #final output: list of neighbours of all points
-    for point1_name in range(N+2):
+    for point1_name in range(nb_vertices+2):
         ngb_current_point = []                  #list of neighbours of the current point
         
-        for point2_name in range(N+2):
+        for point2_name in range(nb_vertices+2):
             if point1_name==point2_name:        #do not check self-connection
                 pass
             
@@ -72,7 +72,7 @@ def find_all_paths(list_vertices, start, goal):
                 
                 #Test the 5 conditions listed above
                 for obstacle in list_sides:
-                    obstacle_flattened = [item for sublist in obstacle for item in sublist]
+                    obstacle_flattened = [vertex for side in obstacle for vertex in side]
                     
                     
                     condition1 = (((point1_name,point2_name) in obstacle)\
