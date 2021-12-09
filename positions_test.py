@@ -25,9 +25,18 @@ print("\nSuccess is", success, "\nRobot position is:", robot_position, "\n")
 success, positions = pos.get_arch_positions(img)
 print("\nSuccess is", success, "\nTwo positions", positions)
 
-draw.annotate_robot(robot_position, img, img_thymio, factor)
-draw.annotate_eiffel_tower(goal, img, img_eiffel, factor)
-draw.annotate_arch(positions, img, img_arch, factor)
+
+print("dimension of image", img.shape, "\nx, y of image", img.shape[0], img.shape[1])
+img2 = np.zeros((img.shape[0], img.shape[1], 3), np.uint8)
+print("dimension of image 2", img2.shape, "\nx, y of image", img2.shape[0], img2.shape[1])
+
+draw.annotate_robot(robot_position, img2, img_thymio, factor)
+draw.annotate_eiffel_tower(goal, img2, img_eiffel, factor)
+draw.annotate_arch(positions, img2, img_arch, factor)
+
 
 cv.imshow("Image with drawings", img)
+cv.waitKey(0)
+
+cv.imshow("image zero", img2)
 cv.waitKey(0)

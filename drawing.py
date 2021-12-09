@@ -67,8 +67,6 @@ def annotate_arch(arch_pos, img, img_arch, scale_factor):
     x = center_arch[0] - round(arch_w/2)
     y = center_arch[1] - round(arch_h/2)
 
-    print("x, y of arch is", x, y)
-
     # write arch on img
     for i in range(img_arch.shape[0]):
         for j in range(img_arch.shape[1]):
