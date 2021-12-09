@@ -26,6 +26,7 @@ Outputs:
 
 import math
 import check_intersection #credits: Ansh Riyal, https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/ (cons. 27.11.2021)
+import point_in_polygon as pt_in_pgn #credits: #Vikas Chitturi, https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/  (cons. 09.12.2021)
 
 
 def find_all_paths(list_vertices, start, goal):
@@ -39,8 +40,8 @@ def find_all_paths(list_vertices, start, goal):
     
     #extract list_sides, the list of all obstacle sides e.g. (vertex1,vertex2),(vertex2,vertex3),etc
     #list_sides is grouped by obstacle:  list_sides = [[obstacle1.sides], [obstacle2.sides], ...]
+    #also, find all overlapping obstacles
     list_sides = obtain_list_sides(list_vertices) 
-
     list_overlaps = find_overlaps(list_vertices)
 
     # 2. Search algorithm
@@ -64,6 +65,8 @@ def find_all_paths(list_vertices, start, goal):
             if point1_name==point2_name:        #do not check self-connection
                 pass
             
+            elif (point1_name in list_overlaps) or (point2_name in list_overlaps): #do not check overlapping obstacles
+                pass
             
             else:
                 point1 = list_points[point1_name]
@@ -182,22 +185,36 @@ def obtain_list_sides(list_vertices):
 
     return list_sides
 
+#%%
 def find_overlaps(list_vertices):
+    #find the length of each obstacle (to introduce shift)
+    length_obstacles = [len(obstacle) for obstacle in list_vertices]
+    
+    #initialize the return
     list_overlaps = []
-    for obstacle in list_vertices:
+    
+    #check for each vertex whether it lies inside another obstacle than its own
+    for obstacle in range(len(list_vertices)):
         vertices_other_obstacles = list_vertices.copy()
-        vertices_other_obstacles.remove(obstacle)
+        vertices_other_obstacles.remove(list_vertices[obstacle])
         
-        for 
+        shift = sum(length_obstacles[0:obstacle]) + 1   #count vertices k,k+1,... instead of 0,1,...
+        
+        for other_obstacle in vertices_other_obstacles:
+            for vertex_idx_in_obstacle in range(len(list_vertices[obstacle])):
+                name_vertex = shift + vertex_idx_in_obstacle
+                coords_vertex = list_vertices[obstacle][vertex_idx_in_obstacle]
+                if pt_in_pgn.is_inside_polygon(other_obstacle, coords_vertex):
+                    list_overlaps.append(name_vertex)
     
     return list_overlaps
 
-#%%
-#test
-# list_vertices = [[(10,10),(20,10),(15,18.66)],\
-#                   [(30,25),(40,15),(53.66,18.66),(57.32,32.32),(47.32,42.32),(33.66,38.66)],\
-#                       [(68.21,44.49),(68.31,61.98),(50.82,62.08),(50.72,44.58)]]
-# start = (0,0)
-# goal = (70,60)
+#%% Test
+# list_vertices = [[(1.38,3.42),(2.74,5.32),(4.96,4.61),(3.39,2.56)],\
+#                   [(3.86,4.27),(4,6),(6.86,5.14),(5.6,2.66)],\
+#                       [(0.93,-0.56),(3.4,1.93),(4,0)],\
+#                           [(-1.6,0.66),(2.7,-0.94),(-1.6,-1.77)]] #with some overlaps
+# start = (-2.84,2)
+# goal = (8.08,-1.73)
 # res = find_all_paths(list_vertices, start, goal)
-# print(res)
+# print("neighbours",res)
