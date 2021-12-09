@@ -5,6 +5,7 @@ ROBOT_SIZE = 0.11  # in meter
 EIFFEL_TOUR_SIZE = 0.14  # in meter
 ARCH_SIZE = 0.15  # in meter
 
+
 def annotate_robot(robot_pos, img, img_thymio, scale_factor):
     """draws the robot on the provided image"""
     # robot dimensions 11 cm x 11cm
