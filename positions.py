@@ -57,14 +57,14 @@ def get_goal_position(img):
 
     if circle is None:
         print("WARNING: no goal position found")
-        return False, None
+        return False, None, None
 
     nb_circles = circle.shape[0]
     #print("\ncoordinates of goal position is:", circle, "\nnumber of goal detected is:", nb_circles)
 
     if nb_circles > 1:
         print("WARNING: more than one goal position found", nb_circles)
-        return False, None
+        return False, None, None
 
     center = circle[0, 0:2]
     radius = circle[0][2]
