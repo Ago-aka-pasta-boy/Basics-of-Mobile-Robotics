@@ -41,7 +41,7 @@ def find_all_paths(list_vertices, start, goal):
     #list_sides is grouped by obstacle:  list_sides = [[obstacle1.sides], [obstacle2.sides], ...]
     list_sides = obtain_list_sides(list_vertices) 
 
-
+    list_overlaps = find_overlaps(list_vertices)
 
     # 2. Search algorithm
     # Determine for each point, what other points it can "see"
@@ -182,7 +182,15 @@ def obtain_list_sides(list_vertices):
 
     return list_sides
 
-
+def find_overlaps(list_vertices):
+    list_overlaps = []
+    for obstacle in list_vertices:
+        vertices_other_obstacles = list_vertices.copy()
+        vertices_other_obstacles.remove(obstacle)
+        
+        for 
+    
+    return list_overlaps
 
 #%%
 #test
