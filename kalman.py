@@ -20,7 +20,7 @@ STD_WHEELSPEED = 20         #std dev. for actual vs. expected linear speed of wh
 STD_MEASURE_COORDS = 20     #in pixels
 STD_MEASURE_THETA = 0.01
 
-THRESHOLD_DISTANCE = 1     #in pixels
+THRESHOLD_DISTANCE = 80     #in pixels
 THRESHOLD_THETA = 0.8
 
 POS_CORRECTION_FACTOR = 3

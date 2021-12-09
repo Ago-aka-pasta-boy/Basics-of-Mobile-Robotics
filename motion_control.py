@@ -2,10 +2,10 @@ import math
 
 KP = 75
 EPSILON = 0.1  # 15 pixels
-NORMAL_SPEED = 150
+NORMAL_SPEED = 300
 MAX_DIV = 1
 
-POSITION_ERROR = 20
+POSITION_ERROR = 50
 
 
 
@@ -28,10 +28,15 @@ def speed_control(err):
         motor_left = NORMAL_SPEED
         motor_right = NORMAL_SPEED
         """
-    #motor_left = NORMAL_SPEED/max(1,abs(err)) - KP * err
-    #motor_right = NORMAL_SPEED/max(1,abs(err)) + KP * err
-    motor_left = NORMAL_SPEED/2
-    motor_right = NORMAL_SPEED/4
+    motor_left = NORMAL_SPEED/max(1,10*abs(err)) - KP * err
+    motor_right = NORMAL_SPEED/max(1,10*abs(err)) + KP * err
+    
+    
+    sgn = lambda x: x/max(abs(x),1e-12)
+    
+    motor_left = sgn(motor_left)*min(abs(motor_left),300)
+    motor_right = sgn(motor_right)*min(abs(motor_right),300)
+    
     return motor_left, motor_right
 
 
@@ -43,12 +48,8 @@ def get_error(robot_pos, next_goal):
     beta = math.atan2(dy, dx)
 
     err = beta-alpha
-    """
-    if err > math.pi:
-        err = err -2 * math.pi
-    if err < -math.pi:
-        err = err + 2 * math.pi
-    """
+    err = (err + math.pi)%(2*math.pi) - math.pi
+    
     return err
 
 
