@@ -37,7 +37,8 @@ def get_error(robot_pos, next_goal):
     beta = math.atan2(dy, dx)
 
     err = beta-alpha
-
+    err = (err+math.pi)%(2*math.pi) - math.pi
+    
     return err
 
 
