@@ -8,7 +8,9 @@ MAX_DIV = 1
 POSITION_ERROR = 20
 
 
+
 def speed_control(err):
+    """
     if err < -EPSILON:
         # turn right
         motor_left = NORMAL_SPEED + KP*abs(err)
@@ -25,7 +27,11 @@ def speed_control(err):
         # go straight
         motor_left = NORMAL_SPEED
         motor_right = NORMAL_SPEED
-
+        """
+    #motor_left = NORMAL_SPEED/max(1,abs(err)) - KP * err
+    #motor_right = NORMAL_SPEED/max(1,abs(err)) + KP * err
+    motor_left = NORMAL_SPEED/2
+    motor_right = NORMAL_SPEED/4
     return motor_left, motor_right
 
 
@@ -37,7 +43,12 @@ def get_error(robot_pos, next_goal):
     beta = math.atan2(dy, dx)
 
     err = beta-alpha
-
+    """
+    if err > math.pi:
+        err = err -2 * math.pi
+    if err < -math.pi:
+        err = err + 2 * math.pi
+    """
     return err
 
 

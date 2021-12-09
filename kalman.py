@@ -16,34 +16,36 @@ import numpy as np
 import math
 from scipy.interpolate import interp1d
 
-AXLE_LENGTH = 0.095
-
-STD_WHEELSPEED = 0.01       #std dev. for actual vs. expected linear speed of wheels
-STD_MEASURE_COORDS = 0.01
+STD_WHEELSPEED = 20         #std dev. for actual vs. expected linear speed of wheels, in pixels
+STD_MEASURE_COORDS = 20     #in pixels
 STD_MEASURE_THETA = 0.01
 
-THRESHOLD_DISTANCE = 10
+THRESHOLD_DISTANCE = 1     #in pixels
 THRESHOLD_THETA = 0.8
 
+POS_CORRECTION_FACTOR = 3
+ANGLE_CORRECTION_FACTOR = 3.6
 
 
-def kalmanfilter(state,Sigma,motorspeed,history, camera, Ts, meters_to_pixels):
+def kalmanfilter(state,Sigma,motorspeed,history, camera, Ts, meters_to_pixels, AXLE_LENGTH):
     #Main function to be used
     
     #convert thymio motorspeed to linear speed (calibration)
     motorspeed = calibrate_motorspeed(motorspeed, meters_to_pixels)
     
     #predict next step
-    state, Sigma, history = predict(state, Sigma, motorspeed, history, Ts)
+    state, Sigma, history = predict(state, Sigma, motorspeed, history, Ts, AXLE_LENGTH)
+    state[2][0] = (state[2][0]+math.pi)%(2*math.pi) - math.pi  #put it in [-pi,pi]
     
     if camera[2] == True:
         #if the vision is available, proceed to update
         state, Sigma = update(state, Sigma, motorspeed, history, camera)
+        state[2][0] = (state[2][0]+math.pi)%(2*math.pi) - math.pi  #put it in [-pi,pi]
     
     return state, Sigma, history
 
 
-def predict(state, Sigma, motorspeed, history, Ts):
+def predict(state, Sigma, motorspeed, history, Ts, AXLE_LENGTH):
     #equations:
         #x_k = Ax_(k-1) + f(Ts, theta_k)*[vright, vleft]
         #y_k = Cx_k
@@ -54,10 +56,10 @@ def predict(state, Sigma, motorspeed, history, Ts):
     A = np.array([[1.,0.,0.],[0.,1.,0.],[0.,0.,1.]])    
     
     #obtain B
-    theta_new = state[2] + Ts*(motorspeed[0]-motorspeed[1])/(2*AXLE_LENGTH) #only used to calculate B
-    B = 0.5*np.array([[math.cos(theta_new),math.cos(theta_new)],\
-                      [math.sin(theta_new),math.sin(theta_new)],\
-                          [1/AXLE_LENGTH, -1/AXLE_LENGTH]])
+    theta_new = state[2] + ANGLE_CORRECTION_FACTOR*Ts*(motorspeed[0]-motorspeed[1])/(2*AXLE_LENGTH) #only used to calculate B
+    B = 0.5*np.array([[POS_CORRECTION_FACTOR*math.cos(theta_new),POS_CORRECTION_FACTOR*math.cos(theta_new)],\
+                      [-POS_CORRECTION_FACTOR*math.sin(theta_new),-POS_CORRECTION_FACTOR*math.sin(theta_new)],\
+                          [ANGLE_CORRECTION_FACTOR*1/AXLE_LENGTH, -ANGLE_CORRECTION_FACTOR*1/AXLE_LENGTH]])
     
     #update history and state (note: @ is the matrix multiplication)
     history = np.roll(history, -1, 0)
@@ -89,14 +91,21 @@ def update(state, Sigma, motorspeed, history, camera):
     state_update = state + K @ innov
     
     #if the measured value is obviously wrong, then do NOT proceed to update
-    if np.linalg.norm(state_update[0:1] - avg_history[0:1]) < THRESHOLD_DISTANCE\
-            and abs(state_update[2] - avg_history[0][2]) < THRESHOLD_THETA:
-                state = state_update
-                Sigma = (np.eye(3) - K@C) @ Sigma
+    posx = state_update[0][0]
+    posy = state_update[1][0]
+    hisx = avg_history[0][0]
+    hisy = avg_history[0][1]
+    
+    if math.dist((posx,posy),(hisx,hisy)) < THRESHOLD_DISTANCE\
+    and abs(state_update[2] - avg_history[0][2]) < THRESHOLD_THETA:
+        state = state_update
+        Sigma = (np.eye(3) - K@C) @ Sigma
+        HISTORY_SIZE = np.size(history, 0)
+        history = [np.reshape(state,(1,3))]*HISTORY_SIZE
     
     return state, Sigma
 
-
+#%%
 def calibrate_motorspeed(motorspeed, meters_to_pixels):
     #convert motor speed to linear speed (m/s)
     
@@ -114,8 +123,18 @@ def calibrate_motorspeed(motorspeed, meters_to_pixels):
     speedRThymio = motorspeed[0]
     speedLThymio = motorspeed[1]
  
-    speedRMetric = f(speedRThymio).item()
-    speedLMetric = f(speedLThymio).item()
+    if speedRThymio > 0 and speedLThymio >0 :
+        speedRMetric = f(min(speedRThymio,300)).item()
+        speedLMetric = f(min(speedLThymio,300)).item()
+    elif speedRThymio < 0 and speedLThymio < 0 :
+        speedRMetric = f(max(speedRThymio,-300)).item()
+        speedLMetric = f(max(speedLThymio,-300)).item()
+    elif speedRThymio > 0 and speedLThymio < 0 :
+        speedRMetric = f(min(speedRThymio, 300)).item()
+        speedLMetric = f(max(speedLThymio,-300)).item()
+    else: #both 0 or speedRThymio < 0 and speedLThymio > 0
+        speedRMetric = f(max(speedRThymio, -300)).item()
+        speedLMetric = f(min(speedLThymio, 300)).item()
 
     speedRPixels = int(speedRMetric * meters_to_pixels)
     speedLPixels = int(speedLMetric * meters_to_pixels)
