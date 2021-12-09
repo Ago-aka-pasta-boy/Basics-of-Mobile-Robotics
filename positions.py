@@ -150,7 +150,7 @@ def get_arch_positions(img):
         mu20 = M["m20"]/M["m00"]-math.pow(cx,2)
 
         # angle between -90° and 90° counter clockwise
-        angle = -0.5*math.atan2(2*mu11,mu20-mu02)
+        angle = -0.5*math.atan2(2*mu11, mu20-mu02)
         #print("\nangle is", angle)
 
     else:
@@ -200,7 +200,7 @@ def extract_red(img):
 
 
 def convert_meter2pxl(radius_pxl):
-    radius_m = 0.07
+    radius_m = 0.035
     scale = radius_pxl/radius_m
 
     return scale
