@@ -70,11 +70,8 @@ def find_shortest_path(obstacle_vertices, start=("unspecified","unspecified"), g
     # 3. Retrace the best path going backwards 
     #(origin = where we came from. predecessor = best origin for a given point)
     names_full_path = []
-    print("test")
-    print("predecessors {}".format(predecessors))
     origin = predecessors[-1]                      #predecessor of goal
     while origin!="reached_start":
-        print(origin)
         names_full_path.insert(0,origin)           #insert predecessor of point i
         origin = predecessors[origin]              #for next loop: change the value of "origin"
     names_full_path.append(name_points[-1])      #add point "goal" to the names_full_path
@@ -195,20 +192,18 @@ def pathname_to_coords(names_path, list_vertices, start, goal):
 
 #----------------------------
 #%% Tests
-# list_vertices = [[(10,10),(20,10),(15,18.66)],\
-#                   [(30,25),(40,15),(53.66,18.66),(57.32,32.32),(47.32,42.32),(33.66,38.66)],\
-#                       [(59.27,27.55),(54.63,70.85),(67.09,69.57),(73.97,36.5)]]
-# start = (0,0)
-# goal = (75.88,42.09)
+# list_vertices = [[(1.38,3.42),(2.74,5.32),(4.96,4.61),(3.39,2.56)],\
+#                   [(3.86,4.27),(4,6),(6.86,5.14),(5.6,2.66)],\
+#                       [(0.93,-0.56),(3.4,1.93),(4,0)],\
+#                           [(-1.6,0.66),(2.7,-0.94),(-1.6,-1.77)]] #with some overlaps
+# start = (-2.84,2)
+# goal = (8.08,-1.73)
 # start_time = time.time()
-# list_neighbours = global_path.find_all_paths(list_vertices, start, goal)
-# res = find_shortest_path(list_vertices, list_neighbours, start, goal)
+# res = find_shortest_path(list_vertices, start, goal)
 
 # print("The shortest path is:{}".format(res))
 
 
-# x, y, xy = names_to_subpaths(res, list_vertices, start, goal)
-# print("x-coordinates of substarts: {}".format(x))
-# print("y-coordinates of substarts: {}".format(y))
-# print("xy-coordinates of subgoals: {}".format(xy))
+# xy = pathname_to_coords(res, list_vertices, start, goal)
+
 # print("Elapsed time: %s seconds" % (time.time() - start_time))
