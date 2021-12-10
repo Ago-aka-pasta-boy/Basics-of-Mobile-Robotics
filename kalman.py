@@ -27,7 +27,8 @@ POS_CORRECTION_FACTOR = 3
 ANGLE_CORRECTION_FACTOR = 3.6
 
 
-def kalmanfilter(state,Sigma,motorspeed,history, camera, Ts, meters_to_pixels, AXLE_LENGTH):
+def kalmanfilter(state,Sigma,motorspeed,history, camera, Ts, meters_to_pixels,\
+                 AXLE_LENGTH, errpos_history, errtheta_history, camera_history):
     #Main function to be used
     
     #convert thymio motorspeed to linear speed (calibration)
@@ -39,10 +40,12 @@ def kalmanfilter(state,Sigma,motorspeed,history, camera, Ts, meters_to_pixels, A
     
     if camera[2] == True:
         #if the vision is available, proceed to update
-        state, Sigma = update(state, Sigma, motorspeed, history, camera)
+        state, Sigma, errpos_history, errtheta_history, camera_history\
+            = update(state, Sigma, motorspeed, history, camera,\
+                     errpos_history, errtheta_history, camera_history)
         state[2][0] = (state[2][0]+math.pi)%(2*math.pi) - math.pi  #put it in [-pi,pi]
     
-    return state, Sigma, history
+    return state, Sigma, history, errpos_history, errtheta_history, camera_history
 
 
 def predict(state, Sigma, motorspeed, history, Ts, AXLE_LENGTH):
@@ -73,7 +76,10 @@ def predict(state, Sigma, motorspeed, history, Ts, AXLE_LENGTH):
     return state,Sigma,history
 
 
-def update(state, Sigma, motorspeed, history, camera):
+def update(state_predicted, Sigma, motorspeed, history, camera, errpos_history, errtheta_history, camera_history):
+    #update camera history
+    camera_history = np.roll(camera_history, -1, 0)
+    camera_history[-1] = np.reshape(camera[0][0],camera[0][1],camera[1],(1,3))
     
     #initialize matrices
     avg_history = np.mean(history,0)
@@ -84,26 +90,61 @@ def update(state, Sigma, motorspeed, history, camera):
     
     #calculate updated state
     y = np.array([[camera[0][0]], [camera[0][1]], [camera[1]]])  #measured states
-    innov = y - (C @ state)
+    innov = y - (C @ state_predicted)
     s = (C @ Sigma @ C.T) + R
     K = Sigma @ C.T @ np.linalg.inv(s) #optimal gain
     
-    state_update = state + K @ innov
+    state_update = state_predicted + K @ innov
     
-    #if the measured value is obviously wrong, then do NOT proceed to update
-    posx = state_update[0][0]
-    posy = state_update[1][0]
-    hisx = avg_history[0][0]
-    hisy = avg_history[0][1]
+
     
-    if math.dist((posx,posy),(hisx,hisy)) < THRESHOLD_DISTANCE\
-    and abs(state_update[2] - avg_history[0][2]) < THRESHOLD_THETA:
-        state = state_update
-        Sigma = (np.eye(3) - K@C) @ Sigma
-        HISTORY_SIZE = np.size(history, 0)
-        history = [np.reshape(state,(1,3))]*HISTORY_SIZE
+    #if the Thymio is lost or its angle keeps being wrong
+    #(continuous mismatch between prediction and measure)
+    #then force a "hard" update of the model (i.e. assume measure=reality)
+    if thymio_is_lost(errpos_history)\
+    or thymio_looks_elsewhere(errtheta_history):
+        cam_x = np.mean([measure[0][0] for measure in camera_history])
+        cam_y = np.mean([measure[0][1] for measure in camera_history])
+        cam_theta = np.mean([measure[1] for measure in camera_history])
+        
+        state = np.array([[cam_x],[cam_y],[cam_theta]])
+        #Sigma = Sigma
+        
+        #reset error histories
+        errpos_history = [0 for i in errpos_history]
+        errtheta_history = [0 for i in errtheta_history]
+        
+        print("WARNING: A hard-update was completed")
     
-    return state, Sigma
+    #if the thymio is not lost and the update value is not an outlier,
+    #then proceed to update
+    #(prevents isolated mismatch between prediction and measure,
+    #when camera "jumps" for just one frame)
+    else:
+        #update error histories
+        errpos_history = np.roll(errpos_history, -1)
+        errpos_history[-1] = math.dist((state_predicted[0][0],state_predicted[1][0]),\
+                                       (camera[0][0],camera[0][1]))     #euclidean distance b/w (x,y) measured & predicted
+        errtheta_history = np.roll(errtheta_history, -1)
+        errtheta_history[-1] = abs(state_predicted[2][0] - camera[1])   #abs difference b/w theta measured & predicted
+        
+        
+        #check whether state_update must be kept
+        posx = state_update[0][0]
+        posy = state_update[1][0]
+        hisx = avg_history[0][0]
+        hisy = avg_history[0][1]
+        
+        if (math.dist((posx,posy),(hisx,hisy)) < THRESHOLD_DISTANCE\
+        and abs(state_update[2] - avg_history[0][2]) < THRESHOLD_THETA):
+            state = state_update
+            Sigma = (np.eye(3) - K@C) @ Sigma
+            
+            HISTORY_SIZE = np.size(history, 0)
+            history = [np.reshape(state,(1,3))]*HISTORY_SIZE
+    
+        
+    return state, Sigma, errpos_history, errtheta_history, camera_history
 
 #%%
 def calibrate_motorspeed(motorspeed, meters_to_pixels):
@@ -143,10 +184,26 @@ def calibrate_motorspeed(motorspeed, meters_to_pixels):
     motorspeed = np.array([[speedRPixels],[speedLPixels]])
     return motorspeed
 
+#%%
+def thymio_is_lost(errpos_history, errtheta_history):
+    """Return True if all errors in the history are above threshold,
+    return False if at least one error in the history is below threshold"""
+    
+    isLost = True
+    for errpos in errpos_history:
+        if errpos < THRESHOLD_DISTANCE:
+            isLost = False
+               
+    return isLost
 
-
-
-
+def thymio_looks_elsewhere(errtheta_history):
+    """Return True if all errors in the history are above threshold,
+    return False if at least one error in the history is below threshold"""
+    for err in errtheta_history:
+        if err < THRESHOLD_THETA:
+            looksElsewhere = False
+    
+    return looksElsewhere
 
 
 #Test: movement in straight line at 45°, camera measures x=y=theta=0 always
