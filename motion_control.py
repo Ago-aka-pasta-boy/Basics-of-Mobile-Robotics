@@ -1,11 +1,11 @@
 import math
-
+ 
 KP = 75
 EPSILON = 0.1  # 15 pixels
 NORMAL_SPEED = 300
 MAX_DIV = 1
 OBST_THR_L = 10      # low obstacle threshold 
-OBST_THR_H= 60      # high obstacle threshold 
+OBST_THR_H = 60      # high obstacle threshold 
 
 
 POSITION_ERROR = 50
