@@ -190,8 +190,8 @@ def thymio_is_lost(errpos_history, errtheta_history):
     return False if at least one error in the history is below threshold"""
     
     isLost = True
-    for errpos in errpos_history:
-        if errpos < THRESHOLD_DISTANCE:
+    for err in errpos_history:
+        if err < THRESHOLD_DISTANCE:
             isLost = False
                
     return isLost
