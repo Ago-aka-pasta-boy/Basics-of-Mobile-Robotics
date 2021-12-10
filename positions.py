@@ -124,7 +124,7 @@ def get_arch_positions(img):
     #cv.destroyAllWindows()
 
     # detect rectangle
-    c, hierarchy = cv.findContours(mask, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)
+    c, hierarchy = cv.findContours(blurred, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)
 
     approx = []
     for i in range(len(c)):
@@ -157,19 +157,16 @@ def get_arch_positions(img):
         print("WARNING: no rectangle found")
         return False, None
 
-    # draw center
-    center = np.array([cx, cy], dtype=int)
-    cv.circle(img, center, 2, (0, 0, 0), 3)
-
     # find point1 and point2
     width = min(math.dist(approx[0][0][0], approx[0][1][0]), math.dist(approx[0][1][0], approx[0][2][0]))
     point1 = np.array([cx + math.sin(angle)*width*2, cy + math.cos(angle)*width*2], dtype=int)
     point2 = np.array([cx - math.sin(angle)*width*2, cy - math.cos(angle)*width*2], dtype=int)
 
     # draw points on img
-    cv.circle(img, point1, 2, (0, 0, 0), 3)
-    cv.circle(img, point2, 2, (0, 0, 0), 3)
-    cv.circle(img, center, 2, (0, 0, 0), 3)
+    #center = np.array([cx, cy], dtype=int)
+    #cv.circle(img, point1, 2, (0, 0, 0), 3)
+    #cv.circle(img, point2, 2, (0, 0, 0), 3)
+    #cv.circle(img, center, 2, (0, 0, 0), 3)
 
     # show center and two positions on image
     #cv.imshow("point1 and point2 of rectangle", img)
