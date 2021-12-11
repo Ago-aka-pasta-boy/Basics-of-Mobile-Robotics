@@ -57,8 +57,9 @@ def predict(state, Sigma, motorspeed, history, Ts, AXLE_LENGTH):
     
     #obtain B
     theta_new = state[2] + ANGLE_CORRECTION_FACTOR*Ts*(motorspeed[0]-motorspeed[1])/(2*AXLE_LENGTH) #only used to calculate B
-    B = 0.5*np.array([[POS_CORRECTION_FACTOR*math.cos(theta_new),POS_CORRECTION_FACTOR*math.cos(theta_new)],\
-                      [-POS_CORRECTION_FACTOR*math.sin(theta_new),-POS_CORRECTION_FACTOR*math.sin(theta_new)],\
+    theta_avg = (state[2] + theta_new)/2
+    B = 0.5*np.array([[POS_CORRECTION_FACTOR*math.cos(theta_avg),POS_CORRECTION_FACTOR*math.cos(theta_avg)],\
+                      [-POS_CORRECTION_FACTOR*math.sin(theta_avg),-POS_CORRECTION_FACTOR*math.sin(theta_avg)],\
                           [ANGLE_CORRECTION_FACTOR*1/AXLE_LENGTH, -ANGLE_CORRECTION_FACTOR*1/AXLE_LENGTH]])
     
     #update history and state (note: @ is the matrix multiplication)
@@ -122,7 +123,7 @@ def calibrate_motorspeed(motorspeed, meters_to_pixels):
     
     speedRThymio = motorspeed[0]
     speedLThymio = motorspeed[1]
- 
+
     if speedRThymio > 0 and speedLThymio >0 :
         speedRMetric = f(min(speedRThymio,300)).item()
         speedLMetric = f(min(speedLThymio,300)).item()
