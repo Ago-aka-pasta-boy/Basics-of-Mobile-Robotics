@@ -2,7 +2,7 @@ import cv2 as cv
 import math
 
 ROBOT_SIZE = 0.11  # in meter
-EIFFEL_TOUR_SIZE = 0.14  # in meter
+EIFFEL_TOUR_SIZE = 0.20  # in meter
 ARCH_SIZE = 0.15  # in meter
 
 

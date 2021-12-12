@@ -13,7 +13,7 @@ def extract_obstacles(img):
     # cv.imshow("second channel", img[:, :, 1])
     # cv.imshow("third channel", img[:, :, 2])
     # RGB input!!
-    thresh = 80
+    thresh = 100
     img_red = img[:, :, 0]
     img_blurred = cv.GaussianBlur(img_red, (5, 5), cv.BORDER_DEFAULT)
     img_filtered = cv.morphologyEx(img_blurred, cv.MORPH_OPEN, np.ones((5, 5)))
