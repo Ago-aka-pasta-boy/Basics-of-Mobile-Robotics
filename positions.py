@@ -2,8 +2,16 @@ import numpy as np
 import cv2 as cv
 import math
 
+RADIUS_GOAL_POS = 0.035  # in meter
+
 
 def detect_circles(img, lower_range, upper_range):
+    """
+    :param img: image of the setup
+    :param lower_range: lower range of the color
+    :param upper_range: upper range of the color
+    :return: array with circles coordinates of the color chosen [[x0, y0, r0], [x1, y1, r1], ...]
+    """
     # convert img from rgb to hsv
     hsv = cv.cvtColor(img, cv.COLOR_BGR2HSV)
 
@@ -11,10 +19,10 @@ def detect_circles(img, lower_range, upper_range):
     mask = cv.inRange(hsv, lower_range, upper_range)
 
     # convert img from rgb to grayscale
-    gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+    grey = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 
     # apply threshold mask to grayscale image
-    img_masked = cv.bitwise_and(gray, gray, mask=mask)
+    img_masked = cv.bitwise_and(grey, grey, mask=mask)
 
     # blur image
     blurred = cv.blur(img_masked, (5, 5))
@@ -29,7 +37,7 @@ def detect_circles(img, lower_range, upper_range):
         return None
 
     # draw circles
-    output = cv.cvtColor(gray, cv.COLOR_GRAY2BGR)
+    output = cv.cvtColor(grey, cv.COLOR_GRAY2BGR)
     circles = np.uint16(np.around(circles))
     for i in circles[0, :]:
         # draw the outer circle
@@ -46,8 +54,12 @@ def detect_circles(img, lower_range, upper_range):
 
     return circles
 
-""" return position of the goal (x,y)"""
+
 def get_goal_position(img):
+    """
+    :param img: image of the setup
+    :return: goal position
+    """
     # color value for green in hsv
     lower_green = np.array([35, 50, 0])
     upper_green = np.array([75, 255, 255])
@@ -66,14 +78,17 @@ def get_goal_position(img):
         print("WARNING: more than one goal position found", nb_circles)
         return False, None, None
 
-    center = circle[0, 0:2]
+    center = circle[0][0:2]
     radius = circle[0][2]
 
     return True, center, radius
 
 
-""" return robot position (x,y) + angle between -pi and pi"""
 def get_robot_position(img):
+    """
+    :param img: image of the setup
+    :return: array with (x, y) coordinates and angle between -pi and pi
+    """
     # mask for blue color in hsv:
     lower_blue = np.array([85, 50, 0])
     upper_blue = np.array([130, 255, 255])
@@ -97,15 +112,15 @@ def get_robot_position(img):
 
     # direction of the robot
     elif nb_circles == 2:
-        if circles[0, 2] > circles[1, 2]:
-            point = circles[0, 0:2]
-            dy = circles[0,1]-circles[1,1]
-            dx = circles[1,0]-circles[0,0]
+        if circles[0][2] > circles[1][2]:
+            point = circles[0][0:2]
+            dy = circles[0][1]-circles[1][1]
+            dx = circles[1][0]-circles[0][0]
 
         else:
-            point = circles[1, 0:2]
-            dy = circles[1, 1] - circles[0, 1]
-            dx = circles[0, 0] - circles[1, 0]
+            point = circles[1][0:2]
+            dy = circles[1][1] - circles[0][1]
+            dx = circles[0][0] - circles[1][0]
 
         angle = math.atan2(dy, dx)
         position = [point, angle]
@@ -113,6 +128,10 @@ def get_robot_position(img):
 
 
 def get_arch_positions(img):
+    """
+    :param img: image of the setup
+    :return: two points by which the robot should pass to pass under the arch
+    """
     # extract red arch in white with threshold
     mask = extract_red(img)
 
@@ -143,15 +162,17 @@ def get_arch_positions(img):
     # check if shape is a rectangle
     if len(approx[0]) == 4:
         M = cv.moments(approx[0])
+
+        # barycenter (cx, cy)
         cx = M["m10"] / M["m00"]
         cy = M["m01"] / M["m00"]
+
         mu11 = M["m11"]/M["m00"]-cx*cy
         mu02 = M["m02"]/M["m00"]-math.pow(cy,2)
         mu20 = M["m20"]/M["m00"]-math.pow(cx,2)
 
         # angle between -90° and 90° counter clockwise
-        angle = -0.5*math.atan2(2*mu11,mu20-mu02)
-        #print("\nangle is", angle)
+        angle = -0.5*math.atan2(2*mu11, mu20-mu02)
 
     else:
         print("WARNING: no rectangle found")
@@ -179,6 +200,10 @@ def get_arch_positions(img):
 
 
 def extract_red(img):
+    """
+    :param img: image of the setup
+    :return: mask that extracts the red color
+    """
     hsv = cv.cvtColor(img, cv.COLOR_BGR2HSV)
 
     # mask detection in hsv for red color
@@ -197,12 +222,11 @@ def extract_red(img):
 
 
 def convert_meter2pxl(radius_pxl):
-    radius_m = 0.07
-    scale = radius_pxl/radius_m
+    """
+    :param radius_pxl: radius of the goal position in pixels
+    :return: conversion_factor from pixels to meter
+    """
+    scale = radius_pxl/RADIUS_GOAL_POS
 
     return scale
-
-
-
-
 
