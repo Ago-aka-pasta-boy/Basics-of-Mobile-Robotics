@@ -72,7 +72,6 @@ def get_goal_position(img):
         return False, None, None
 
     nb_circles = circle.shape[0]
-    #print("\ncoordinates of goal position is:", circle, "\nnumber of goal detected is:", nb_circles)
 
     if nb_circles > 1:
         print("WARNING: more than one goal position found", nb_circles)
@@ -100,7 +99,6 @@ def get_robot_position(img):
         return False, None
 
     nb_circles = circles.shape[0]
-    #print("\ncoordinates of circle is:", circles, "\nnumber of circles detected is:", nb_circles)
 
     if nb_circles > 2:
         print("WARNING: more than 2 circles found for robot position", nb_circles)
@@ -123,7 +121,7 @@ def get_robot_position(img):
             dx = circles[0][0] - circles[1][0]
 
         angle = math.atan2(dy, dx)
-        position = [point, angle]
+        position = (point, angle)
         return True, position
 
 
@@ -161,6 +159,8 @@ def get_arch_positions(img):
 
     # check if shape is a rectangle
     if len(approx[0]) == 4:
+        # source of formulas to calculate angle and center:
+        # http://raphael.candelier.fr/?blog=Image%20Moments
         M = cv.moments(approx[0])
 
         # barycenter (cx, cy)
@@ -184,13 +184,14 @@ def get_arch_positions(img):
     point2 = tuple(np.array([cx - math.sin(angle)*width*2, cy - math.cos(angle)*width*2], dtype=int))
 
     # draw points on img
+    #output = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
     #center = np.array([cx, cy], dtype=int)
-    #cv.circle(img, point1, 2, (0, 0, 0), 3)
-    #cv.circle(img, point2, 2, (0, 0, 0), 3)
-    #cv.circle(img, center, 2, (0, 0, 0), 3)
+    #cv.circle(output, point1, 2, (0, 0, 0), 3)
+    #cv.circle(output, point2, 2, (0, 0, 0), 3)
+    #cv.circle(output, center, 2, (0, 0, 0), 3)
 
     # show center and two positions on image
-    #cv.imshow("point1 and point2 of rectangle", img)
+    #cv.imshow("point1 and point2 of rectangle", output)
     #cv.waitKey(0)
     #cv.destroyAllWindows()
 
