@@ -6,7 +6,7 @@ import math
 # Arc de Triomphe dimensions (15cm X 15cm) wanted in comparison to thymio
 
 ROBOT_SIZE = 0.11  # in meter
-EIFFEL_TOUR_SIZE = 0.20  # in meter
+EIFFEL_TOWER_SIZE = 0.20  # in meter
 ARCH_SIZE = 0.15  # in meter
 
 
