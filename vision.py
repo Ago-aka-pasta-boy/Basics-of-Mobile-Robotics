@@ -1,29 +1,10 @@
 import numpy as np
 import cv2 as cv
 import math
+import copy
 
 SCALING_FACTOR = 50
 ROBOT_LINE = 50
-
-
-def crop_map(img):
-    """crop the black borders out of the image to have a clean image to work on"""
-    max_crop = 3
-    thresh = 100
-    crop = 0
-    img_gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-    img_blurred = cv.GaussianBlur(img_gray, (5, 5), cv.BORDER_DEFAULT)
-    img_filtered = cv.morphologyEx(img_blurred, cv.MORPH_CLOSE, np.ones((5, 5)))    # closing is a dilation followed by
-    for i in range(1, max_crop, 5):                                                 # an erosion; it gets rid of small
-        crop = i                                                                    # black dots
-        cropped = img_filtered[i:-i, i:-i]
-        ret, temp = cv.threshold(cropped, thresh, 255, cv.THRESH_BINARY_INV)
-        # cv.imshow("Thresholded", temp)        # uncomment to debug
-        if np.sum(temp[1, :]) < 10 or np.sum(temp[temp.shape[0]-1, :]) < 10 or\
-                np.sum(temp[:, 1]) < 10 or np.sum(temp[:, temp.shape[1]-1]) < 10:
-            break
-    cropped_img = img[crop:-crop, crop:-crop]
-    return True, cropped_img
 
 
 def extract_obstacles(img):
@@ -33,8 +14,8 @@ def extract_obstacles(img):
     # cv.imshow("third channel", img[:, :, 2])
     # RGB input!!
     thresh = 80
-    img_green = img[:, :, 1]
-    img_blurred = cv.GaussianBlur(img_green, (5, 5), cv.BORDER_DEFAULT)
+    img_red = img[:, :, 0]
+    img_blurred = cv.GaussianBlur(img_red, (5, 5), cv.BORDER_DEFAULT)
     img_filtered = cv.morphologyEx(img_blurred, cv.MORPH_OPEN, np.ones((5, 5)))
     ret, img_ready = cv.threshold(img_filtered, thresh, 255, cv.THRESH_BINARY)
     cv.imshow("Thresholded", img_ready)
@@ -62,7 +43,7 @@ def extract_obstacles(img):
 
 def expand_obstacles(obstacles):
     """expand the size of the obstacles to take the robot size in account for the path"""
-    ex_obstacles = np.copy(obstacles)
+    ex_obstacles = copy.deepcopy(obstacles)
     for c in range(len(obstacles)):
         moments = cv.moments(obstacles[c])
         if moments["m00"] == 0:
