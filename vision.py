@@ -2,7 +2,7 @@ import numpy as np
 import cv2 as cv
 import math
 
-SCALING_FACTOR = 40
+SCALING_FACTOR = 50
 ROBOT_LINE = 50
 
 
@@ -50,7 +50,7 @@ def extract_obstacles(img):
     obstacles = []
     for i in range(len(approximations)):
         # print("approx", i, len(approximations[i]))        # uncomment to debug
-        if (len(approximations[i]) < 6) and (len(approximations[i]) > 2):
+        if (len(approximations[i]) < 8) and (len(approximations[i]) > 2):
             obstacles.append(approximations[i])
     im3 = np.zeros(img.shape)
     cv.drawContours(im3, obstacles, -1, (0, 255, 0), 3)
