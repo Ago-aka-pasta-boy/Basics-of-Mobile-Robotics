@@ -23,8 +23,8 @@ STD_MEASURE_THETA = 0.01
 THRESHOLD_DISTANCE = 80     #in pixels
 THRESHOLD_THETA = 0.8
 
-POS_CORRECTION_FACTOR = 3
-ANGLE_CORRECTION_FACTOR = 3.6
+POS_CORRECTION_FACTOR = 1.2
+ANGLE_CORRECTION_FACTOR = 2.5
 
 
 def kalmanfilter(state,Sigma,motorspeed,history, camera, Ts, meters_to_pixels,\
@@ -104,9 +104,11 @@ def update(state_predicted, Sigma, motorspeed, history, camera, errpos_history, 
     #then force a "hard" update of the model (i.e. assume measure=reality)
     if thymio_is_lost(errpos_history)\
     or thymio_looks_elsewhere(errtheta_history):
-        cam_x = np.mean([measure[0][0] for measure in camera_history])
-        cam_y = np.mean([measure[0][1] for measure in camera_history])
-        cam_theta = np.mean([measure[0][2] for measure in camera_history])
+        best_measures = findClosestSamples(camera_history)        
+        
+        cam_x = np.mean([camera_history[best_measures[0]][0][0], camera_history[best_measures[1]][0][0]])
+        cam_y = np.mean([camera_history[best_measures[0]][0][1], camera_history[best_measures[1]][0][1]])
+        cam_theta = np.mean([camera_history[best_measures[0]][0][2], camera_history[best_measures[1]][0][2]])
         
         state = np.array([[cam_x],[cam_y],[cam_theta]])
         #Sigma = Sigma
@@ -207,6 +209,22 @@ def thymio_looks_elsewhere(errtheta_history):
     
     return looksElsewhere
 
+def findClosestSamples(measures):
+    #only take x and y
+    min_dist = math.dist((measures[0][0][0],measures[0][0][1]),(measures[1][0][0],measures[1][0][1]))
+    closestSamples = (0,1)
+    print("initial", closestSamples)
+    
+    
+    for sample1_idx in range(0, np.size(measures,0)):
+        for sample2_idx in range(sample1_idx+1, np.size(measures,0)):
+            dist_candidate = math.dist((measures[sample1_idx][0][0],measures[sample1_idx][0][1]),(measures[sample2_idx][0][0],measures[sample2_idx][0][1]))
+            if dist_candidate < min_dist:
+                min_dist = dist_candidate
+                closestSamples = (sample1_idx, sample2_idx)
+    
+    print("final", closestSamples)
+    return closestSamples
 
 #Test: movement in straight line at 45°, camera measures x=y=theta=0 always
 # meters_to_pixels = 1
