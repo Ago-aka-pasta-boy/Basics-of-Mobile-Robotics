@@ -1,22 +1,33 @@
-"""Source: https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/ (consulted 27.11.2021)
-This code is contributed by Ansh Riyal
-
-Description: A Python3 program to find if 2 given line segments defined by (p1,q1) and (p2,q2) intersect or not"""
+"""
+---
+Source: (consulted 27.11.2021)
+    https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/ 
+    This code is contributed by Ansh Riyal.
+--- 
+Description: 
+    A Python3 program to find if 2 given line segments defined by (p1,q1) 
+    and (p2,q2) intersect or not.
+"""
  
 class Point:
     def __init__(self, x, y):
         self.x = x
         self.y = y
  
-# Given three collinear points p, q, r, the function checks if
-# point q lies on line segment 'pr'
+
 def onSegment(p, q, r):
+    """
+    Given three collinear points p, q, r, the function checks if
+    point q lies on line segment 'pr'
+
+    """
     if ( (q.x <= max(p.x, r.x)) and (q.x >= min(p.x, r.x)) and
            (q.y <= max(p.y, r.y)) and (q.y >= min(p.y, r.y))):
         return True
     return False
 
 def orientation(p, q, r):
+    """
     # to find the orientation of an ordered triplet (p,q,r)
     # function returns the following values:
     # 0 : Collinear points
@@ -25,8 +36,9 @@ def orientation(p, q, r):
      
     # See https://www.geeksforgeeks.org/orientation-3-ordered-points/amp/
     # for details of below formula.
-     
-    val = (float(q.y - p.y) * (r.x - q.x)) - (float(q.x - p.x) * (r.y - q.y))
+    """
+    
+    val = (float(q.y - p.y)*(r.x - q.x)) - (float(q.x - p.x)*(r.y - q.y))
     if (val > 0):
          
         # Clockwise orientation
@@ -40,9 +52,12 @@ def orientation(p, q, r):
         # Collinear orientation
         return 0
  
-# The main function that returns true if
-# the line segment 'p1q1' and 'p2q2' intersect.
 def doIntersect(p1,q1,p2,q2):
+    """
+    The main function that returns true if 
+    the line segment 'p1q1' and 'p2q2' intersect.
+
+    """
      
     # Find the 4 orientations required for
     # the general and special cases
@@ -76,34 +91,4 @@ def doIntersect(p1,q1,p2,q2):
     # If none of the cases
     return False
  
-# Driver program to test above functions:
-# p1 = Point(1, 1)
-# q1 = Point(10, 1)
-# p2 = Point(1, 2)
-# q2 = Point(10, 2)
- 
-# if doIntersect(p1, q1, p2, q2):
-#     print("Yes")
-# else:
-#     print("No")
- 
-# p1 = Point(10, 0)
-# q1 = Point(0, 10)
-# p2 = Point(0, 0)
-# q2 = Point(10,10)
- 
-# if doIntersect(p1, q1, p2, q2):
-#     print("Yes")
-# else:
-#     print("No")
- 
-# p1 = Point(-5,-5)
-# q1 = Point(0, 0)
-# p2 = Point(1, 1)
-# q2 = Point(10, 10)
- 
-# if doIntersect(p1, q1, p2, q2):
-#     print("Yes")
-# else:
-#     print("No")
      
