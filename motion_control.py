@@ -14,12 +14,16 @@ def check_obstacle(prox_sensors):
     Input: Values of the proximity sensors measured via Thymio
     
     ---
-    Outputs: - obstacle: a boolean  True = there is an obstacle somewhere in front of the robot
+    Outputs: - obstacle: a boolean  True = there is an obstacle somewhere in 
+                                            front of the robot
                                     False = no obstacle in front of the robot
              - obst_front: value of the third proximity sensor
-             - mean_obst_left: mean value between the first and the second proximity sensors
-             - mean_obst_right: mean value between the fourth and the fifth proximity sensors
+             - mean_obst_left: mean value between the first and the second 
+                               proximity sensors
+             - mean_obst_right: mean value between the fourth and the fifth 
+                                proximity sensors
     """
+    
     # acquisition from the proximity sensors to detect obstacles
     obst = [prox_sensors[0], prox_sensors[1], \
             prox_sensors[2], prox_sensors[3], \
@@ -30,7 +34,8 @@ def check_obstacle(prox_sensors):
     obst_front = obst[2]
     
     #determines if there is an obstacle or not in front of the robot
-    if (mean_obst_right > OBST_THR_H) or (mean_obst_left > OBST_THR_H) or (obst_front > OBST_THR_H) :
+    if (mean_obst_right > OBST_THR_H) or (mean_obst_left > OBST_THR_H) \
+        or (obst_front > OBST_THR_H) :
         obstacle = True
     else:
         obstacle = False
@@ -40,9 +45,10 @@ def check_obstacle(prox_sensors):
 def speed_control(err):
     """
     ---
-    Description : Sets the speed of the robot's wheels depending on the error value
+    Description : Sets the speed of the robot's wheels depending on the 
+                 error value
     ---
-    Inputs: Angle error between the robot's position and its next goal position
+    Input: Angle error between the robot's position and its next goal position
         
     ---
     Outputs: - motor_left: Value to assign to the left wheel of the robot
@@ -62,19 +68,47 @@ def speed_control(err):
 
 
 def get_error(robot_pos, next_goal):
+    """
+    --- 
+    Description: Calculate the error between the angle error 
+                  between the robot's position and its next goal position 
+    
+    ---
+    Inputs: - robot_pos: Value of the robot position ((x, y), angle)
+            - next_goal: Value of the next goal position
+    
+    ---
+    Output: Angle error between the robot's position and its next goal position
+        
+    """
+   
     alpha = robot_pos[1]
 
-    dy = robot_pos[0][1]-next_goal[1]
-    dx = next_goal[0]-robot_pos[0][0]
+    dy = robot_pos[0][1] - next_goal[1]
+    dx = next_goal[0] - robot_pos[0][0]
     beta = math.atan2(dy, dx)
 
-    err = beta-alpha
-    err = (err+math.pi)%(2*math.pi) - math.pi
+    err = beta - alpha
+    err = (err + math.pi)%(2*math.pi) - math.pi
     
     return err
 
 
 def check_robot_arrived(robot_pos, next_goal):
+    """
+    --- 
+    Description: Check if the robot arrived to its goal position
+    
+    ---
+    Inputs: - robot_pos: Value of the robot position ((x, y), angle)
+            - next_goal: Value of the next goal position
+    
+    ---
+    Output: - True: The robot arrived to its goal
+            - False: The robot did not arrived to its goal
+        
+    """
+    
     if math.dist(robot_pos[0], next_goal) < POSITION_ERROR:
         print("eureka en grand")
         return True
