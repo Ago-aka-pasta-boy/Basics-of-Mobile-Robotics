@@ -15,12 +15,13 @@ and doIntersect()
 # caused overflow problems)
 INT_MAX = 10000
   
-"""
-Given three collinear points p, q, r,  
-the function checks if point q lies 
-on line segment 'pr' 
-"""
+#%%
 def onSegment(p:tuple, q:tuple, r:tuple) -> bool:
+    """
+    Given three collinear points p, q, r,  
+    the function checks if point q lies 
+    on line segment 'pr' 
+    """
       
     if ((q[0] <= max(p[0], r[0])) &
         (q[0] >= min(p[0], r[0])) &
@@ -29,16 +30,17 @@ def onSegment(p:tuple, q:tuple, r:tuple) -> bool:
         return True
           
     return False
-  
-""" 
-To find orientation of ordered triplet (p, q, r). 
- The function returns following values 
- 0 --> p, q and r are collinear 
- 1 --> Clockwise 
- 2 --> Counterclockwise 
-"""
+
+#%%
 def orientation(p:tuple, q:tuple, r:tuple) -> int:
-      
+    """ 
+    To find orientation of ordered triplet (p, q, r). 
+     The function returns following values 
+     0 --> p, q and r are collinear 
+     1 --> Clockwise 
+     2 --> Counterclockwise 
+    """
+          
     val = (((q[1] - p[1]) * 
             (r[0] - q[0])) - 
            ((q[0] - p[0]) * 
@@ -50,7 +52,8 @@ def orientation(p:tuple, q:tuple, r:tuple) -> int:
         return 1 # Collinear
     else:
         return 2 # Clock or counterclock
-  
+ 
+#%%    
 def doIntersect(p1, q1, p2, q2):
       
     # Find the four orientations needed for  
@@ -87,10 +90,12 @@ def doIntersect(p1, q1, p2, q2):
   
     return False
   
-# Returns true if the point p lies  
-# inside the polygon[] with n vertices 
+
+#%%
 def is_inside_polygon(points:list, p:tuple) -> bool:
-      
+    """
+    Returns true if the point p lies inside the polygon[] with n vertices 
+    """
     n = len(points)
       
     # There must be at least 3 vertices

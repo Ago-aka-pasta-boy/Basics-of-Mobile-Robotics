@@ -14,15 +14,20 @@ class Point:
         self.x = x
         self.y = y
  
-# Given three collinear points p, q, r, the function checks if
-# point q lies on line segment 'pr'
+
 def onSegment(p, q, r):
+    """
+    Given three collinear points p, q, r, the function checks if
+    point q lies on line segment 'pr'
+
+    """
     if ( (q.x <= max(p.x, r.x)) and (q.x >= min(p.x, r.x)) and
            (q.y <= max(p.y, r.y)) and (q.y >= min(p.y, r.y))):
         return True
     return False
 
 def orientation(p, q, r):
+    """
     # to find the orientation of an ordered triplet (p,q,r)
     # function returns the following values:
     # 0 : Collinear points
@@ -31,7 +36,8 @@ def orientation(p, q, r):
      
     # See https://www.geeksforgeeks.org/orientation-3-ordered-points/amp/
     # for details of below formula.
-     
+    """
+    
     val = (float(q.y - p.y)*(r.x - q.x)) - (float(q.x - p.x)*(r.y - q.y))
     if (val > 0):
          
@@ -46,9 +52,12 @@ def orientation(p, q, r):
         # Collinear orientation
         return 0
  
-# The main function that returns true if
-# the line segment 'p1q1' and 'p2q2' intersect.
 def doIntersect(p1,q1,p2,q2):
+    """
+    The main function that returns true if 
+    the line segment 'p1q1' and 'p2q2' intersect.
+
+    """
      
     # Find the 4 orientations required for
     # the general and special cases

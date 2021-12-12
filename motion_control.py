@@ -9,7 +9,7 @@ POSITION_ERROR = 50
 def check_obstacle(prox_sensors):
     """"
     --- 
-    Description : Checks if there is an obstacle somewhere in front of the robot
+    Description: Checks if there is an obstacle somewhere in front of the robot
     ---
     Input: Values of the proximity sensors measured via Thymio
     
@@ -74,8 +74,8 @@ def get_error(robot_pos, next_goal):
                   between the robot's position and its next goal position 
     
     ---
-    Inputs: - robot_pos: Value of the robot position ((x, y), angle)
-            - next_goal: Value of the next goal position
+    Inputs: - robot_pos:  [(x, y), angle] Value of the robot position
+            - next_goal:  (x, y) Value of the next goal position
     
     ---
     Output: Angle error between the robot's position and its next goal position
@@ -100,8 +100,8 @@ def check_robot_arrived(robot_pos, next_goal):
     Description: Checks if the robot arrived to its goal position
     
     ---
-    Inputs: - robot_pos: Value of the robot position ((x, y), angle)
-            - next_goal: Value of the next goal position
+    Inputs: - robot_pos:  [(x, y), angle] Value of the robot position
+            - next_goal:  (x, y) Value of the next goal position
     
     ---
     Output: - True: The robot arrived to its goal
