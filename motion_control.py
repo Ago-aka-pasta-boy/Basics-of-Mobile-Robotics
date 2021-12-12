@@ -8,8 +8,12 @@ POSITION_ERROR = 50
 
 def check_obstacle(prox_sensors):
     """"
+    --- 
+    Description : Check if there is an obstacle somewhere in front of the robot
+    ---
     Input: Values of the proximity sensors measured via Thymio
     
+    ---
     Outputs: - obstacle: a boolean  True = there is an obstacle somewhere in front of the robot
                                     False = no obstacle in front of the robot
              - obst_front: value of the third proximity sensor
@@ -34,8 +38,19 @@ def check_obstacle(prox_sensors):
 
 
 def speed_control(err):
-    motor_left = NORMAL_SPEED/max(1,10*abs(err)) - KP * err
-    motor_right = NORMAL_SPEED/max(1,10*abs(err)) + KP * err
+    """
+    ---
+    Description : Sets the speed of the robot's wheels depending on the error value
+    ---
+    Inputs: Angle error between the robot's position and its next goal position
+        
+    ---
+    Outputs: - motor_left: Value to assign to the left wheel of the robot
+             - motor_right: Value to assign to the right wheel of the robot
+    """
+    
+    motor_left = NORMAL_SPEED/max(1,10*abs(err)) - KP*err
+    motor_right = NORMAL_SPEED/max(1,10*abs(err)) + KP*err
     
     
     sgn = lambda x: x/max(abs(x),1e-12)
