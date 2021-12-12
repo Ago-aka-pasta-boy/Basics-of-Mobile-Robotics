@@ -6,6 +6,7 @@ OBST_THR_L = 10      # low obstacle threshold
 OBST_THR_H = 60      # high obstacle threshold 
 POSITION_ERROR = 50 
 
+#%%
 def check_obstacle(prox_sensors):
     """"
     --- 
@@ -41,7 +42,7 @@ def check_obstacle(prox_sensors):
         obstacle = False
     return obstacle, obst_front, mean_obst_left, mean_obst_right
 
-
+#%%
 def speed_control(err):
     """
     ---
@@ -66,7 +67,7 @@ def speed_control(err):
     
     return motor_left, motor_right
 
-
+#%%
 def get_error(robot_pos, next_goal):
     """
     --- 
@@ -93,7 +94,7 @@ def get_error(robot_pos, next_goal):
     
     return err
 
-
+#%%
 def check_robot_arrived(robot_pos, next_goal):
     """
     --- 
