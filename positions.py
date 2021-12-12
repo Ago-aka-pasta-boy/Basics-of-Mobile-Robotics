@@ -17,13 +17,15 @@ def detect_circles(img, lower_range, upper_range):
 
     # threshold colored circles
     mask = cv.inRange(hsv, lower_range, upper_range)
+    cv.imwrite('images/brouillon/mask.jpg', mask)
 
     # convert img from rgb to grayscale
     grey = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+    cv.imwrite('images/brouillon/grey.jpg', grey)
 
     # apply threshold mask to grayscale image
     img_masked = cv.bitwise_and(grey, grey, mask=mask)
-    cv.imwrite('images/report/img_masked.jpg', img_masked)
+    cv.imwrite('images/brouillon/img_masked.jpg', img_masked)
 
     # blur image
     blurred = cv.blur(img_masked, (5, 5))
