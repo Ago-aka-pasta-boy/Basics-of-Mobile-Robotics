@@ -52,8 +52,12 @@ def extract_obstacles(img):
                            the Mth obstacle
              - Bolean returns false: if no obstacles found
     """
+
+    # Extract the red obstacles from the red channel
     img_red = img[:, :, RED_CHANNEL]
     blurred = cv.GaussianBlur(img_red, KERNEL_SIZE, cv.BORDER_DEFAULT)
+
+    # Perform an opening, which consists of an erosion plus a dilation
     img_filtered = cv.morphologyEx(blurred, cv.MORPH_OPEN,np.ones(KERNEL_SIZE))
     ret, img_ready = cv.threshold(img_filtered, THRESH, 255, cv.THRESH_BINARY)
     cv.imshow("Thresholded", img_ready)
@@ -61,7 +65,8 @@ def extract_obstacles(img):
                                           cv.CHAIN_APPROX_SIMPLE)
     im2 = np.zeros(img.shape)
     approximations = []
-    
+
+    # Approximate each contour and evaluate their plausibility
     for count in range(len(contours)):
         epsilon = APPROX_FACTOR*cv.arcLength(contours[count], True)
         if (cv.arcLength(contours[count], True) < MAX_CTR_SIZE) & \
@@ -71,7 +76,8 @@ def extract_obstacles(img):
     cv.drawContours(im2, approximations, ALL_CTRS, GREEN, PIXEL_WIDTH)
     cv.imshow("Contours", im2)
     obstacles = []
-    
+
+    # Build the list and perform a second check on the obstacles
     for i in range(len(approximations)):
         if (len(approximations[i]) < MAX_VERT_OBST) and \
             (len(approximations[i]) > MIN_VERT_OBST):
@@ -108,6 +114,10 @@ def expand_obstacles(obstacles):
     ex_obstacles = copy.deepcopy(obstacles)
     
     for c in range(len(obstacles)):
+
+        # The formula to find the center is: cx = (M10/M00),cy = (M01/M00)
+        # was found at the address:
+        #https://www.geeksforgeeks.org/python-opencv-find-center-of-contour/
         moments = cv.moments(obstacles[c])
         
         if not moments["m00"]:
@@ -117,7 +127,9 @@ def expand_obstacles(obstacles):
             
         cx = int(moments["m10"]/moments["m00"])
         cy = int(moments["m01"]/moments["m00"])
-        
+
+        # For each vertex compute the vector to the center
+        # and move by a constant times this vector to make space for Thymio
         for d in range(len(obstacles[c])):
             vec_x = obstacles[c][d][0][0] - cx
             vec_y = obstacles[c][d][0][1] - cy
