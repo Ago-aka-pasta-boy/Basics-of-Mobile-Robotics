@@ -1,17 +1,25 @@
-# A Python3 program to check if a given point  
-# lies inside a given polygon 
-# This code is contributed by Vikas Chitturi
-# Refer https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/ 
-# for explanation of functions onSegment(), 
-# orientation() and doIntersect()  
-  
+"""
+--- 
+Source: (consulted 09.12.2021)
+    https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/ 
+    This code is contributed by Vikas Chitturi.
+    
+---     
+Description :
+    
+A Python3 program to check if a given point lies inside a given polygon 
+Refers the link above for explanation of functions onSegment(), orientation() 
+and doIntersect()  
+"""
 # Define Infinite (Using INT_MAX  
 # caused overflow problems)
 INT_MAX = 10000
   
-# Given three collinear points p, q, r,  
-# the function checks if point q lies 
-# on line segment 'pr' 
+"""
+Given three collinear points p, q, r,  
+the function checks if point q lies 
+on line segment 'pr' 
+"""
 def onSegment(p:tuple, q:tuple, r:tuple) -> bool:
       
     if ((q[0] <= max(p[0], r[0])) &
@@ -22,11 +30,13 @@ def onSegment(p:tuple, q:tuple, r:tuple) -> bool:
           
     return False
   
-# To find orientation of ordered triplet (p, q, r). 
-# The function returns following values 
-# 0 --> p, q and r are collinear 
-# 1 --> Clockwise 
-# 2 --> Counterclockwise 
+""" 
+To find orientation of ordered triplet (p, q, r). 
+ The function returns following values 
+ 0 --> p, q and r are collinear 
+ 1 --> Clockwise 
+ 2 --> Counterclockwise 
+"""
 def orientation(p:tuple, q:tuple, r:tuple) -> int:
       
     val = (((q[1] - p[1]) * 
