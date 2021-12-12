@@ -1,12 +1,29 @@
 import math
-
+ 
 KP = 75
 EPSILON = 0.1  # 15 pixels
 NORMAL_SPEED = 300
 MAX_DIV = 1
+OBST_THR_L = 10      # low obstacle threshold 
+OBST_THR_H = 60      # high obstacle threshold 
+
 
 POSITION_ERROR = 50
 
+def check_obstacle(prox_sensors):
+    # acquisition from the proximity sensors to detect obstacles
+    obst = [prox_sensors[0], prox_sensors[1], \
+            prox_sensors[2], prox_sensors[3], \
+            prox_sensors[4]]
+    mean_obst_left = (obst[0] + obst[1])//2
+    mean_obst_right = (obst[3] + obst[4])//2
+    obst_front = obst[2]
+    
+    if (mean_obst_right > OBST_THR_H) or (mean_obst_left > OBST_THR_H) or (obst_front > OBST_THR_H) :
+        obstacle = True
+    else:
+        obstacle = False
+    return obstacle, obst_front, mean_obst_left, mean_obst_right
 
 
 def speed_control(err):

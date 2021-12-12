@@ -30,6 +30,7 @@ import point_in_polygon as pt_in_pgn #credits: #Vikas Chitturi, https://www.geek
 
 
 def find_all_paths(list_vertices, start, goal):
+    """Main function that finds the visibility graph"""
     # 1. Initialisation
     
     #transform list_vertices into a list of all points including start & goal. 
@@ -187,6 +188,7 @@ def obtain_list_sides(list_vertices):
 
 #%%
 def find_overlaps(list_vertices):
+    """finds all overlaps (i.e. when a vertex lies on the wrong obstacle)"""
     #find the length of each obstacle (to introduce shift)
     length_obstacles = [len(obstacle) for obstacle in list_vertices]
     
