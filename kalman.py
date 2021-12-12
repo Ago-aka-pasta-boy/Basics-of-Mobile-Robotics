@@ -106,7 +106,7 @@ def update(state_predicted, Sigma, motorspeed, history, camera, errpos_history, 
     or thymio_looks_elsewhere(errtheta_history):
         cam_x = np.mean([measure[0][0] for measure in camera_history])
         cam_y = np.mean([measure[0][1] for measure in camera_history])
-        cam_theta = np.mean([measure[1] for measure in camera_history])
+        cam_theta = np.mean([measure[0][2] for measure in camera_history])
         
         state = np.array([[cam_x],[cam_y],[cam_theta]])
         #Sigma = Sigma
