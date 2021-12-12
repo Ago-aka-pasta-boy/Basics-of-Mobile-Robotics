@@ -89,9 +89,9 @@ def get_heuristics(nb_vertices, obstacle_vertices_flattened, start, goal):
     
     Inputs: 
         - goal, start: identical to ones given to find_shortest_path
-        - N, obstacle_vertices_flattened: obtained from find_shortest_path
+        - nb_vertices, obstacle_vertices_flattened: obtained from find_shortest_path
         
-    Outputs: heuristic for each point [h0, h1, ..., hN]
+    Outputs: heuristic for each point [h0, h1, ..., hN,0]
     """
     heuristic = [0]*(nb_vertices+2)
     dist = lambda p1,p2: math.sqrt((p1[1]-p2[1])**2+(p1[0]-p2[0])**2)
