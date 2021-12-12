@@ -1,16 +1,20 @@
 import cv2 as cv
 import math
 
+# Thymio size 11cm x 11cm
+# Eiffel Tower dimensions (14cm X 14cm) wanted in comparison to thymio
+# Arc de Triomphe dimensions (15cm X 15cm) wanted in comparison to thymio
+
 ROBOT_SIZE = 0.11  # in meter
-EIFFEL_TOUR_SIZE = 0.14  # in meter
+EIFFEL_TOWER_SIZE = 0.14  # in meter
 ARCH_SIZE = 0.15  # in meter
 
 
 def annotate_robot(robot_pos, img, img_thymio, scale_factor):
-    """draws the robot on the provided image"""
-    # robot dimensions 11 cm x 11cm
-    thymio_w = round(ROBOT_SIZE*scale_factor+0.3*ROBOT_SIZE*scale_factor)
-    thymio_h = round(ROBOT_SIZE*scale_factor+0.3*ROBOT_SIZE*scale_factor)
+    """ Print thymio image on the provided image according to its position and angle """
+    # Resize Thymio image with Thymio dimensions in pixels
+    thymio_w = round(ROBOT_SIZE*scale_factor + 0.3*ROBOT_SIZE*scale_factor)
+    thymio_h = round(ROBOT_SIZE*scale_factor + 0.3*ROBOT_SIZE*scale_factor)
     img_thymio = cv.resize(img_thymio, (thymio_w, thymio_h))
 
     #cv.imshow("Thymio reshaped", img_thymio)
@@ -37,17 +41,20 @@ def annotate_robot(robot_pos, img, img_thymio, scale_factor):
 
 
 def annotate_eiffel_tower(goal_pos, img, img_eiffel, scale_factor):
-    # goal dimensions diameter = 7cm => eiffel tower height = 14cm
-    goal_w = round(EIFFEL_TOUR_SIZE*scale_factor + 0.3 * EIFFEL_TOUR_SIZE*scale_factor)
-    goal_h = round(EIFFEL_TOUR_SIZE*scale_factor + 0.3 * EIFFEL_TOUR_SIZE*scale_factor)
-
+    """ Print Eiffel Tower image on the provided image on the goal position """
+    # Resize Eiffel Tower image with Eiffel dimensions in pixels
+    goal_w = round(EIFFEL_TOWER_SIZE*scale_factor + 0.3 * EIFFEL_TOWER_SIZE*scale_factor)
+    goal_h = round(EIFFEL_TOWER_SIZE*scale_factor + 0.3 * EIFFEL_TOWER_SIZE*scale_factor)
     img_eiffel = cv.resize(img_eiffel, (goal_w, goal_h))
+
     #cv.imshow("Eiffel reshaped", img_eiffel)
     #cv.waitKey(0)
 
+    # Place of Eiffel Tower in the provided image
     x = goal_pos[0]-round(goal_w/2)
     y = goal_pos[1]-round(goal_h/2)
 
+    # Write Eiffel on img
     for i in range(img_eiffel.shape[0]):
         for j in range(img_eiffel.shape[1]):
             if img_eiffel[i, j, 3] > 0:
@@ -55,11 +62,12 @@ def annotate_eiffel_tower(goal_pos, img, img_eiffel, scale_factor):
 
 
 def annotate_arch(arch_pos, img, img_arch, scale_factor):
-    # arch dimensions 15 cm
+    """ Print Arc de Triomphe image at the arch position on the provided image"""
+    # Resize arch image with arch dimensions in pixels
     arch_w = round(ARCH_SIZE * scale_factor + 0.3 * ARCH_SIZE * scale_factor)
     arch_h = round(ARCH_SIZE * scale_factor + 0.3 * ARCH_SIZE * scale_factor)
-
     img_arch = cv.resize(img_arch, (arch_w, arch_h))
+
     #cv.imshow("Arch reshaped", img_arch)
     #cv.waitKey(0)
 
