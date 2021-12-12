@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Applies a Kalman filter and returns current state x,y,theta as a 3*1 np.array
 Inputs:
     - state = np.array([x_k-1,y_k-1,theta_k-1]) is the state at step k-1. theta is in rad.
@@ -26,7 +25,7 @@ THRESHOLD_THETA = 0.8
 POS_CORRECTION_FACTOR = 3
 ANGLE_CORRECTION_FACTOR = 3.6
 
-
+#%%
 def kalmanfilter(state,Sigma,motorspeed,history, camera, Ts, meters_to_pixels,\
                  AXLE_LENGTH, errpos_history, errtheta_history, camera_history):
     #Main function to be used
@@ -47,7 +46,7 @@ def kalmanfilter(state,Sigma,motorspeed,history, camera, Ts, meters_to_pixels,\
     
     return state, Sigma, history, errpos_history, errtheta_history, camera_history
 
-
+#%%
 def predict(state, Sigma, motorspeed, history, Ts, AXLE_LENGTH):
     #equations:
         #x_k = Ax_(k-1) + f(Ts, theta_k)*[vright, vleft]
@@ -75,7 +74,7 @@ def predict(state, Sigma, motorspeed, history, Ts, AXLE_LENGTH):
     
     return state,Sigma,history
 
-
+#%%
 def update(state_predicted, Sigma, motorspeed, history, camera, errpos_history, errtheta_history, camera_history):
     state = state_predicted
     #update camera history
@@ -206,34 +205,3 @@ def thymio_looks_elsewhere(errtheta_history):
             looksElsewhere = False
     
     return looksElsewhere
-
-
-#Test: movement in straight line at 45°, camera measures x=y=theta=0 always
-# meters_to_pixels = 1
-
-# state0 = np.array([[0],[0],[45*math.pi/180]]) #3-by-1 np.array
-# Sigma0 = np.diag([0.01,0.01,0.01])
-
-# N = 15 #size of history
-# history = [np.reshape(state0,(1,3))]*N
-
-# motorspeed = [120,120] #command sent to Thymio
-# camera = [(0,0),0,True] #live output of the camera
-# Ts = 0.1 #sampling time
-
-# #test it
-# state, Sigma, history = kalmanfilter(state0,Sigma0,motorspeed,history, camera, Ts, meters_to_pixels)
-# iter = 1
-# print("Iteration {}".format(iter))
-# print("State {}".format(state))
-# print("Sigma {}".format(Sigma))
-# #print("History {}".format(history))
-# print("\n \n")
-# for k in range(5):
-#     state, Sigma, history = kalmanfilter(state,Sigma,motorspeed,history, camera, Ts, meters_to_pixels)
-#     iter += 1
-#     print("Iteration {}".format(iter))
-#     print("State {}".format(state))
-#     print("Sigma {}".format(Sigma))
-#     #print("History {}".format(history))
-#     print("\n \n")
