@@ -23,6 +23,7 @@ def check_obstacle(prox_sensors):
              - mean_obst_right: mean value between the fourth and the fifth 
                                 proximity sensors
     """
+    
     # acquisition from the proximity sensors to detect obstacles
     obst = [prox_sensors[0], prox_sensors[1], \
             prox_sensors[2], prox_sensors[3], \
@@ -69,7 +70,7 @@ def speed_control(err):
 def get_error(robot_pos, next_goal):
     """
     --- 
-    Description : Calculate the error between the angle error 
+    Description: Calculate the error between the angle error 
                   between the robot's position and its next goal position 
     
     ---
@@ -80,7 +81,6 @@ def get_error(robot_pos, next_goal):
     Output: Angle error between the robot's position and its next goal position
         
     """
-
    
     alpha = robot_pos[1]
 
@@ -95,6 +95,20 @@ def get_error(robot_pos, next_goal):
 
 
 def check_robot_arrived(robot_pos, next_goal):
+    """
+    --- 
+    Description: Check if the robot arrived to its goal position
+    
+    ---
+    Inputs: - robot_pos: Value of the robot position ((x, y), angle)
+            - next_goal: Value of the next goal position
+    
+    ---
+    Output: - True: The robot arrived to its goal
+            - False: The robot did not arrived to its goal
+        
+    """
+    
     if math.dist(robot_pos[0], next_goal) < POSITION_ERROR:
         print("eureka en grand")
         return True
