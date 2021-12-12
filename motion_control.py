@@ -1,24 +1,31 @@
 import math
  
-KP = 75
-EPSILON = 0.1  # 15 pixels
-NORMAL_SPEED = 300
-MAX_DIV = 1
+KP = 75              #proportional gain for the P-controller
+NORMAL_SPEED = 300   #normal speed of the robot
 OBST_THR_L = 10      # low obstacle threshold 
 OBST_THR_H = 60      # high obstacle threshold 
-
-
-POSITION_ERROR = 50
+POSITION_ERROR = 50 
 
 def check_obstacle(prox_sensors):
+    """"
+    Input: Values of the proximity sensors measured via Thymio
+    
+    Outputs: - obstacle: a boolean  True = there is an obstacle somewhere in front of the robot
+                                    False = no obstacle in front of the robot
+             - obst_front: value of the third proximity sensor
+             - mean_obst_left: mean value between the first and the second proximity sensors
+             - mean_obst_right: mean value between the fourth and the fifth proximity sensors
+    """
     # acquisition from the proximity sensors to detect obstacles
     obst = [prox_sensors[0], prox_sensors[1], \
             prox_sensors[2], prox_sensors[3], \
             prox_sensors[4]]
+    
     mean_obst_left = (obst[0] + obst[1])//2
     mean_obst_right = (obst[3] + obst[4])//2
     obst_front = obst[2]
     
+    #determines if there is an obstacle or not in front of the robot
     if (mean_obst_right > OBST_THR_H) or (mean_obst_left > OBST_THR_H) or (obst_front > OBST_THR_H) :
         obstacle = True
     else:
@@ -27,24 +34,6 @@ def check_obstacle(prox_sensors):
 
 
 def speed_control(err):
-    """
-    if err < -EPSILON:
-        # turn right
-        motor_left = NORMAL_SPEED + KP*abs(err)
-        motor_right = NORMAL_SPEED - KP*abs(err)
-        print("first if")
-#/(max(abs(err),MAX_DIV))
-    elif err > EPSILON: 
-    # turn left     
-        motor_left = NORMAL_SPEED - KP * abs(err)
-        motor_right = NORMAL_SPEED + KP * abs(err)
-        print("second if")
-
-    else:
-        # go straight
-        motor_left = NORMAL_SPEED
-        motor_right = NORMAL_SPEED
-        """
     motor_left = NORMAL_SPEED/max(1,10*abs(err)) - KP * err
     motor_right = NORMAL_SPEED/max(1,10*abs(err)) + KP * err
     
