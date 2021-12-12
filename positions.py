@@ -23,11 +23,13 @@ def detect_circles(img, lower_range, upper_range):
 
     # apply threshold mask to grayscale image
     img_masked = cv.bitwise_and(grey, grey, mask=mask)
+    cv.imwrite('images/report/img_masked.jpg', img_masked)
 
     # blur image
     blurred = cv.blur(img_masked, (5, 5))
-    # cv.imshow("image blurred", blurred)
-    # cv.waitKey(0)
+    cv.imwrite('images/report/blurred.jpg', blurred)
+    cv.imshow("image blurred", blurred)
+    cv.waitKey(0)
     # cv.destroyAllWindows()
 
     # detect circles
@@ -45,8 +47,9 @@ def detect_circles(img, lower_range, upper_range):
         # draw the center of the circle
         cv.circle(output, (i[0], i[1]), 2, (0, 0, 255), 3)
 
-    # cv.imshow("detected circles", output)
-    # cv.waitKey(0)
+    cv.imwrite('images/report/circles.jpg', output)
+    cv.imshow("detected circles", output)
+    cv.waitKey(0)
     # cv.destroyAllWindows()
 
     # convert the (x, y) coordinates and radius of the circles to integers
@@ -134,13 +137,16 @@ def get_arch_positions(img):
     """
     # extract red arch in white with threshold
     mask = extract_red(img)
+    cv.imwrite('images/report/mask_arch.jpg', mask)
 
     # blur image
     blurred = cv.blur(mask, (5, 5))
+    cv.imwrite('images/report/blurred_arch.jpg', blurred)
 
-    #cv.imshow("image blurred", blurred)
-    #cv.waitKey(0)
-    #cv.destroyAllWindows()
+
+    cv.imshow("image blurred", blurred)
+    cv.waitKey(0)
+    cv.destroyAllWindows()
 
     # detect rectangle
     c, hierarchy = cv.findContours(blurred, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)
@@ -184,15 +190,16 @@ def get_arch_positions(img):
     point2 = tuple(np.array([cx - math.sin(angle)*width*2, cy - math.cos(angle)*width*2], dtype=int))
 
     # draw points on img
-    #center = np.array([cx, cy], dtype=int)
-    #cv.circle(img, point1, 2, (0, 0, 0), 3)
-    #cv.circle(img, point2, 2, (0, 0, 0), 3)
-    #cv.circle(img, center, 2, (0, 0, 0), 3)
+    center = np.array([cx, cy], dtype=int)
+    cv.circle(img, point1, 2, (0, 0, 0), 3)
+    cv.circle(img, point2, 2, (0, 0, 0), 3)
+    cv.circle(img, center, 2, (0, 0, 0), 3)
 
     # show center and two positions on image
-    #cv.imshow("point1 and point2 of rectangle", img)
-    #cv.waitKey(0)
-    #cv.destroyAllWindows()
+    cv.imwrite('images/report/arch_point.jpg', img)
+    cv.imshow("point1 and point2 of rectangle", img)
+    cv.waitKey(0)
+    cv.destroyAllWindows()
 
     positions = point1, point2
 
