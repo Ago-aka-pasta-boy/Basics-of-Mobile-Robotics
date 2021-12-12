@@ -15,7 +15,7 @@ def find_shortest_path(obstacle_vertices, start=("unspecified","unspecified"),\
     ---
     Inputs:
         - obstacle_vertices:
-        [[(x1,y1),...,(x_k_,y_k)],...,[(xx1,yy1),(xx2,yy2),...,(xx_n,yy_n)]] ???
+        [[(x1.1,y1.1),...,(x1.k,y1.k)],[(x2.1,y2.1),...,(x2.n,y2.n)],...]
         Each embedded list corresponds to an obstacle.
         Each tuple (x,y) contains the coordinates of an obstacle's vertex.
     
@@ -126,9 +126,9 @@ def explore_graph(points_to_explore, name_points, list_neighbours, \
     ---
     
     Inputs: - points_to_explore: list of all points' names except goal
-                                (elements will be removed from it) ???
+                                (elements will be removed from it)
             - name_points: ordered list of all points' names
-                           (this list will stay intact)???
+                           (this list will stay intact)
             - list_neighbours: list with the name and distance of all 
                                 points' neighbours
             - weights_Dijkstra: min. distance to reach points from the start

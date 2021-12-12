@@ -238,7 +238,7 @@ def calibrate_motorspeed(motorspeed, meters_to_pixels):
     """
     #convert motor speed to linear speed (m/s)
     
-    #instruction given -> ??? which instructions? 
+    #motor instructios given when testing
     thymio_instruction = [-300,-250,-200,-150,-100,-50,50,100,150,200,250,300]   
     #time to cross corridor [s]
     chrono = [-27,-33,-41,-54,-119,-140,140,119,54,41,33,27]  
