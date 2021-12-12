@@ -77,9 +77,10 @@ def predict(state, Sigma, motorspeed, history, Ts, AXLE_LENGTH):
 
 
 def update(state_predicted, Sigma, motorspeed, history, camera, errpos_history, errtheta_history, camera_history):
+    state = state_predicted
     #update camera history
     camera_history = np.roll(camera_history, -1, 0)
-    camera_history[-1] = np.reshape(camera[0][0],camera[0][1],camera[1],(1,3))
+    camera_history[-1] = np.reshape([camera[0][0],camera[0][1],camera[1]],(1,3))
     
     #initialize matrices
     avg_history = np.mean(history,0)
@@ -185,7 +186,7 @@ def calibrate_motorspeed(motorspeed, meters_to_pixels):
     return motorspeed
 
 #%%
-def thymio_is_lost(errpos_history, errtheta_history):
+def thymio_is_lost(errpos_history):
     """Return True if all errors in the history are above threshold,
     return False if at least one error in the history is below threshold"""
     
@@ -199,6 +200,7 @@ def thymio_is_lost(errpos_history, errtheta_history):
 def thymio_looks_elsewhere(errtheta_history):
     """Return True if all errors in the history are above threshold,
     return False if at least one error in the history is below threshold"""
+    looksElsewhere = True
     for err in errtheta_history:
         if err < THRESHOLD_THETA:
             looksElsewhere = False
