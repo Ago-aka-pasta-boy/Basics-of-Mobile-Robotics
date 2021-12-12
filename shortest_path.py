@@ -1,52 +1,52 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Wed Nov 24 13:22:07 2021
-
-Main function which can be run in other scripts: find_shortest_path
-Finds the shortest path on a graph, given the position of the points in the graph.
-Inputs: 
-    - obstacle_vertices, list of lists of tuples [[(x1,y1),(x2,y2),...,(x_k_,y_k)],...,[(xx1,yy1),(xx2,yy2),...,(xx_n,yy_n)]]. 
-    Each embedded list corresponds to an obstacle.
-    Each tuple (x,y) contains the coordinates of a vertex of the obstacle.
-
-    - list_neighbours, list of lists of tuples [[(point,distance),(point,distance),...],...,[(point,distance),(point,distance),...,(point,distance)]]
-    Each embedded list corresponds to the neighbours of a given point.
-    Each tuple (point,distance) contains the name of the neighbour and its distance from that point.
-    
-    - goal and start: coordinates (x,y) of the goal and start. If not specified, a Dijkstra algorithm will be used ; 
-    otherwise, A* with Euclidean distance will be used.
-
-Output:
-    names_full_path, ordered list that contains the optimal path for the graph. 
-    Example: [0,1,3,5,6,7,8] where 0 is start and 8 is goal
-"""
-
 import sys
-import time
 import math
 sys.path.insert(1, 'Global_navigation')
 import global_path
 
-
-
 INFINITY = 100000
 
 def find_shortest_path(obstacle_vertices, start=("unspecified","unspecified"), goal=("unspecified","unspecified")):
+    """
+    ---
+    Description: Main function which finds the shortest path for Thymio.
+    Relies on Dijkstra or A* (heuristic: Euclidean distance to goal) algorithm.
+    ---
+    Inputs:
+        - obstacle_vertices:
+        [[(x1,y1),...,(x_k_,y_k)],...,[(xx1,yy1),(xx2,yy2),...,(xx_n,yy_n)]] 
+        Each embedded list corresponds to an obstacle.
+        Each tuple (x,y) contains the coordinates of a vertex of the obstacle.
+    
+        - goal and start: coordinates (x,y) of the goal and start.
+        If not specified, a Dijkstra algorithm will be used ; 
+        if specified, A* algorithm will be used.
+    ---
+    Output:
+        - names_full_path: 
+            ordered list that contains the optimal path for the graph.
+            Example: [0,3,1,5,7,6,8] where 0 is start and 8 is goal.
+    """
+    
     # 1. Initialisation
-    #find all neighbours
-    list_neighbours = global_path.find_all_paths(obstacle_vertices, start, goal)
+    #obtain the visibility graph
+    list_neighbours = \
+        global_path.find_all_paths(obstacle_vertices, start, goal)
 
-    #attribute a name to each point: start (point 0), obstacle vertices (vertices 1...N), and goal (point N+1)
-    obstacle_vertices_flattened = [vertex for sublist in obstacle_vertices for vertex in sublist]
+    #give a name to each point: 
+    #start (point 0), obstacle vertices (vertices 1...N), and goal (point N+1)
+    obstacle_vertices_flattened = \
+        [vertex for sublist in obstacle_vertices for vertex in sublist]
     nb_vertices = len(obstacle_vertices_flattened)                                            
-    name_points = list(range(nb_vertices+2))
+    name_points = list(range(nb_vertices + 2))
 
-    #attribute heuristics to each point (Euclidean distance if A*, 0 otherwise)
-    heuristic = get_heuristics(nb_vertices, obstacle_vertices_flattened, start, goal)
-
-    #attribute initial weights to each point
-    weights_Dijkstra = [INFINITY]*(nb_vertices+2)      # min distance to reach each point from start. Before exploration, =infinity
-    weights_total = weights_Dijkstra.copy()  # weights_total = weights_Dijkstra + heuristic
+    #give heuristics and initial weights to each point
+    #weights_Dijkstra = min. distance to reach a point from start
+    #weights_total = weights_Dijkstra + heuristic
+    heuristic = \
+        get_heuristics(nb_vertices, obstacle_vertices_flattened, start, goal)
+    weights_Dijkstra = [INFINITY]*(nb_vertices + 2)
+    weights_total = weights_Dijkstra.copy()
     weights_Dijkstra[0] = 0
     weights_total[0] = heuristic[0]
     
@@ -54,27 +54,26 @@ def find_shortest_path(obstacle_vertices, start=("unspecified","unspecified"), g
     predecessors = ["unknown"]*(nb_vertices+2)
     predecessors[0] = "reached_start"
     
-    #list of points to be explored
     points_to_explore = name_points.copy()
-    points_to_explore.remove(nb_vertices+1)             #no need to explore the goal
+    points_to_explore.remove(nb_vertices + 1)   #do not explore the goal
     
     
-    
-    # 2. Apply Dijkstra or A*
-    explore_graph(points_to_explore, name_points, list_neighbours,\
-                  weights_total, weights_Dijkstra, heuristic,\
-                      predecessors, goal)
+    # 2. Graph search
+    predecessors = explore_graph(points_to_explore, name_points,\
+                   list_neighbours, weights_total, weights_Dijkstra,\
+                   heuristic, predecessors, goal)
     
         
         
-    # 3. Retrace the best path going backwards 
-    #(origin = where we came from. predecessor = best origin for a given point)
+    # 3. Retrace the best path going backwards (goal to start)
+    #origin = where we came from
+    #predecessor = best origin for a given point
     names_full_path = []
-    origin = predecessors[-1]                      #predecessor of goal
+    origin = predecessors[-1]
     while origin!="reached_start":
-        names_full_path.insert(0,origin)           #insert predecessor of point i
-        origin = predecessors[origin]              #for next loop: change the value of "origin"
-    names_full_path.append(name_points[-1])      #add point "goal" to the names_full_path
+        names_full_path.insert(0, origin)
+        origin = predecessors[origin]
+    names_full_path.append(name_points[-1])     #add the goal
 
 
     return names_full_path
@@ -83,20 +82,28 @@ def find_shortest_path(obstacle_vertices, start=("unspecified","unspecified"), g
 
 #%%
 def get_heuristics(nb_vertices, obstacle_vertices_flattened, start, goal):
-    """Assigns a heuristic to each point. 
-    If the goal is not specified, then standard Dijkstra is applied (heuristic=0).
-    Otherwise, the heuristic is the euclidean distance to the goal.
-    
-    Inputs: 
-        - goal, start: identical to ones given to find_shortest_path
-        - nb_vertices, obstacle_vertices_flattened: obtained from find_shortest_path
-        
-    Outputs: heuristic for each point [h0, h1, ..., hN,0]
     """
-    heuristic = [0]*(nb_vertices+2)
-    dist = lambda p1,p2: math.sqrt((p1[1]-p2[1])**2+(p1[0]-p2[0])**2)
+    ---
+    Description: Assign a heuristic to each point.
+                If the goal is not specified, 
+                standard Dijkstra is applied (heuristic=0).
+                If the goal is specified, the heuristic is the Euclidean 
+                distance to the goal.
+                
+    ---
+    Inputs: - nb_vertices: number of obstacle vertices
+            - obstacle_vertices_flattened: list of obstacle vertices,
+            NOT grouped by obstacle
+            - goal, start: coordinates (x,y) of the goal and start
+            
+    ---
+    Output: - heuristic for each point [h0, h1, ..., hN,0]
+    """
+    heuristic = [0]*(nb_vertices + 2)
+    dist = lambda p1,p2: math.sqrt((p1[1] - p2[1])**2 + (p1[0] - p2[0])**2)
     if goal!=("unspecified","unspecified"):
-        heuristic = [dist(goal,vertex) for vertex in obstacle_vertices_flattened]
+        heuristic = \
+            [dist(goal,vertex) for vertex in obstacle_vertices_flattened]
         heuristic.append(0)
         heuristic.insert(0,dist(goal,start))
         
@@ -106,81 +113,106 @@ def get_heuristics(nb_vertices, obstacle_vertices_flattened, start, goal):
 
 #%%
 def explore_graph(points_to_explore, name_points, list_neighbours, weights_total, weights_Dijkstra, heuristic, predecessors, goal):
-    """" This function applies the Dijkstra (or A*) algorithm:
-        at each step, it chooses the point with smallest weight
-        and explores from there.
-        It does so until reaching the goal (case A*) 
-        or until the whole graph is explored (case Dijkstra)
-        
-        Inputs: 
-            - list_points, goal: identical to ones given to find_shortest_path
-            - other inputs: taken directly from find_shortest_path
-            
-        Output: 
-            predecessors, list of ideal predecessor for each node [p0,p1,...,pN],
-            where each entry is the name of a node
+    """" 
+    ---
+    Description: Applies the Dijkstra or A* algorithm:
+                at each step, it chooses the point with smallest weight
+                and explores from there.
+                It does so until reaching the goal (case A*) 
+                or until the whole graph is explored (case Dijkstra)
+    ---
+    
+    Inputs: - points_to_explore: list of all points' names except goal
+                (elements will be removed from it)
+            - name_points: ordered list of all points' names
+                (this list will stay intact)
+            - list_neighbours: output from global_path.find_all_paths()
+                [ngb_start,ngb_1, ..., ngb_N, ngb_goal]
+                contains the name and distance of all points' neighbours
+            - weights_Dijkstra: min. distance to reach points from the start
+            - weights_total = weights_Dijkstra + heuristic
+            - heuristic: heuristic of each points (0 if Dijkstra is used,
+                        Euclidean distance to goal if A* is used)
+            - predecessors: ["reached_goal", "unknown", ..., "unknown"]
+                        will be filled to become the output
+            - goal: coordinates (x,y) of the goal
+    ---
+    
+    Output: - predecessors: list of ideal predecessor for each point 
+            ["reached_goal",p1,...,pN, p(N+1)]    
     """
-    #the while loop stops when points_to_explore is empty
+    #stops when points_to_explore is empty
     while points_to_explore:                                
         weights_unexplored = []
         for point in points_to_explore:
             weights_unexplored.append(weights_total[point])
         
-        #set the current point to the one with lowest weight. 
-        #get its neighbours' names and their associated distance (name,dist)
-        current_point = points_to_explore[weights_unexplored.index(min(weights_unexplored))]
+        #explore the point with lowest weight 
+        current_point = points_to_explore\
+            [weights_unexplored.index(min(weights_unexplored))]
         current_neighbours = list_neighbours[current_point]
         
-        #for each neighbour of the current point, calculate its new total weight.
+        
         for ngb in current_neighbours:
             ngb_name = ngb[0]
             ngb_dist = ngb[1]
             
-            weight_candidate = weights_Dijkstra[current_point] + ngb_dist + heuristic[ngb_name]
+            weight_candidate = \
+               weights_Dijkstra[current_point] + ngb_dist + heuristic[ngb_name]
             
-            #if this weight is better than previous, 
-            #update it and set current_point as best predecessor for this neighbour.
+            #if this weight is better than previous, update it
+            #and set current_point as best predecessor for this neighbour.
             if weight_candidate<weights_total[ngb_name]:
                 weights_total[ngb_name] = weight_candidate
-                weights_Dijkstra[ngb_name] = weights_Dijkstra[current_point] + ngb_dist
+                weights_Dijkstra[ngb_name] = weights_Dijkstra[current_point]\
+                                            + ngb_dist
                 predecessors[ngb_name] = current_point
                 
-                #if this neighbour was already explored, allow to re-explore it to update weights
+                #if this neighbour was already explored, 
+                #allow to re-explore it to update weights
                 if ngb_name not in points_to_explore:
                     points_to_explore.append(ngb_name)
         
-        #remove the current point from unexplored points
         points_to_explore.remove(current_point)
         
         
-        
-        #if A* is used, exit the loop once the goal is reached (no need to explore the entire graph)
-        current_neighbours_flat = [x for sublist in current_neighbours for x in sublist]
-        name_current_neighbours = current_neighbours_flat[0::2]                 #name of neighbours
+        #if A* is used, exit the loop once the goal is reached 
+        #(no need to explore the entire graph)
+        current_neighbours_flat = \
+            [x for sublist in current_neighbours for x in sublist]
+            
+        #neighbours = (name,dist) --> only take even values
+        name_current_neighbours = current_neighbours_flat[0::2]
         
         if goal!=("unspecified","unspecified")\
             and (name_points[-1] in name_current_neighbours):                
-            #print("Unexplored nodes: {}".format(points_to_explore)) #some nodes are unexplored
             break
         
         
-    
     return predecessors
 
 
 
 #%%
 def pathname_to_coords(names_path, list_vertices, start, goal):
-    """"Converts the return of shortest_path into coordinates.
-    
-    Inputs:
-        similar as previous functions. names_path is the return from shortest_path.
+    """"
+    ---
+    Description: converts points' names into points' coordinates
+    ---
+    Inputs: - names_path: ordered list that contains the optimal path
+                for the graph, stored as names.
+                Example: [0,3,1,5,7,6,8] where 0 is start and 8 is goal.
+            - list_vertices: coordinates of obstacle vertices, sorted
+                by obstacle
+            - start, goal: (x,y) coordinates of the start and goal
         
-    Output:
-        - coords = [(node0.x, node0.y), (nodeK.x,nodeK.y),..., (nodeP.x, nodeP.y), (node(N+1).x, node(N+1).y)]
-        where the robot must do node0 --> nodeK --> ...--> nodeP --> node(N+1)
-        """
-    obstacle_vertices_flattened = [vertex for sublist in list_vertices for vertex in sublist]
+    ---
+    Output: - coords, list of coordinates of points along the path.
+                Example: [(10,15), (20,30),..., (50,50)]
+                where start = (10,15) and goal = (50,50)
+    """
+    obstacle_vertices_flattened = \
+        [vertex for sublist in list_vertices for vertex in sublist]
 
     coords = [start]
     for i in names_path[1:-1]:
@@ -188,22 +220,3 @@ def pathname_to_coords(names_path, list_vertices, start, goal):
     coords.append(goal)
 
     return coords
-
-
-#----------------------------
-#%% Tests
-# list_vertices = [[(1.38,3.42),(2.74,5.32),(4.96,4.61),(3.39,2.56)],\
-#                   [(3.86,4.27),(4,6),(6.86,5.14),(5.6,2.66)],\
-#                       [(0.93,-0.56),(3.4,1.93),(4,0)],\
-#                           [(-1.6,0.66),(2.7,-0.94),(-1.6,-1.77)]] #with some overlaps
-# start = (-2.84,2)
-# goal = (8.08,-1.73)
-# start_time = time.time()
-# res = find_shortest_path(list_vertices, start, goal)
-
-# print("The shortest path is:{}".format(res))
-
-
-# xy = pathname_to_coords(res, list_vertices, start, goal)
-
-# print("Elapsed time: %s seconds" % (time.time() - start_time))
