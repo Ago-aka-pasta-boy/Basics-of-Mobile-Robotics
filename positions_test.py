@@ -2,7 +2,7 @@ import numpy as np
 import cv2 as cv
 import positions as pos
 
-img = cv.imread('img_test_final.jpg', cv.IMREAD_COLOR)
+img = cv.imread('images/report/original.jpg', cv.IMREAD_COLOR)
 cv.imshow("image", img)
 cv.waitKey(0)
 
