@@ -78,7 +78,7 @@ def get_goal_position(img):
         print("WARNING: more than one goal position found", nb_circles)
         return False, None, None
 
-    center = circle[0][0:2]
+    center = tuple(circle[0][0:2])
     radius = circle[0][2]
 
     return True, center, radius
@@ -113,12 +113,12 @@ def get_robot_position(img):
     # direction of the robot
     elif nb_circles == 2:
         if circles[0][2] > circles[1][2]:
-            point = circles[0][0:2]
+            point = tuple(circles[0][0:2])
             dy = circles[0][1]-circles[1][1]
             dx = circles[1][0]-circles[0][0]
 
         else:
-            point = circles[1][0:2]
+            point = tuple(circles[1][0:2])
             dy = circles[1][1] - circles[0][1]
             dx = circles[0][0] - circles[1][0]
 
@@ -130,7 +130,7 @@ def get_robot_position(img):
 def get_arch_positions(img):
     """
     :param img: image of the setup
-    :return: two points by which the robot should pass to pass under the arch
+    :return: a tuple with two points by which the robot should pass to pass under the arch
     """
     # extract red arch in white with threshold
     mask = extract_red(img)
@@ -180,8 +180,8 @@ def get_arch_positions(img):
 
     # find point1 and point2
     width = min(math.dist(approx[0][0][0], approx[0][1][0]), math.dist(approx[0][1][0], approx[0][2][0]))
-    point1 = np.array([cx + math.sin(angle)*width*2, cy + math.cos(angle)*width*2], dtype=int)
-    point2 = np.array([cx - math.sin(angle)*width*2, cy - math.cos(angle)*width*2], dtype=int)
+    point1 = tuple(np.array([cx + math.sin(angle)*width*2, cy + math.cos(angle)*width*2], dtype=int))
+    point2 = tuple(np.array([cx - math.sin(angle)*width*2, cy - math.cos(angle)*width*2], dtype=int))
 
     # draw points on img
     #center = np.array([cx, cy], dtype=int)
