@@ -180,8 +180,8 @@ def get_arch_positions(img):
 
     # find point1 and point2
     width = min(math.dist(approx[0][0][0], approx[0][1][0]), math.dist(approx[0][1][0], approx[0][2][0]))
-    point1 = tuple(np.array([cx + math.sin(angle)*width*2, cy + math.cos(angle)*width*2], dtype=int))
-    point2 = tuple(np.array([cx - math.sin(angle)*width*2, cy - math.cos(angle)*width*2], dtype=int))
+    point1 = tuple(np.array([cx + math.sin(angle)*width*2.5, cy + math.cos(angle)*width*2.5], dtype=int))
+    point2 = tuple(np.array([cx - math.sin(angle)*width*2.5, cy - math.cos(angle)*width*2.5], dtype=int))
 
     # draw points on img
     #output = cv.cvtColor(img, cv.COLOR_BGR2GRAY)

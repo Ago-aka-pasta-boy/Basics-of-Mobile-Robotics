@@ -4,7 +4,7 @@ KP = 75              #proportional gain for the P-controller
 NORMAL_SPEED = 300   #normal speed of the robot
 OBST_THR_L = 10      # low obstacle threshold 
 OBST_THR_H = 60      # high obstacle threshold 
-POSITION_ERROR = 50 
+POSITION_ERROR = 35 
 
 #%%
 def check_obstacle(prox_sensors):
